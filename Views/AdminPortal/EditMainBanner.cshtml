@@ -1,0 +1,128 @@
+﻿@using GCRBA.ViewModels
+
+@{
+    ViewBag.Title = "Edit Homepage";
+}
+<style>
+	td{
+		text-align:center
+	}
+	.news-profile-thumbnail {
+		width: 15em;
+	}
+
+	.news-profile-image-container {
+		border: 1px solid gray;
+		-webkit-border-radius: 0.3em;
+		-moz-border-radius: 0.3em;
+		border-radius: 0.3em;
+		padding: 0.4em;
+		margin-right: 1em;
+		margin-bottom: 1em;
+		display: inline-block;
+	}
+</style>
+
+<div id="site-banner" class="some-spacing">
+	<h2>@ViewBag.Title</h2>
+</div>
+@if (ViewBag.isAdmin == false) {
+    <p>This page can only be view by admin. Please log in as an admin and try again.</p>
+}
+else {
+<table>
+	@using (Html.BeginForm("EditMainBanner", "AdminPortal", FormMethod.Post, new { enctype = "multipart/form-data" })) {
+		<tr>
+			<td colspan="2">
+				<div class="container w-50">
+
+
+					@*// if Flag == 1, banner has successfully been added to database*@
+					@if (ViewBag.Flag == 1) {
+						@*// let admin know banner was successfully added to db*@
+						<p id="newBannerSuccess">The homepage banner has been successfully updated! Go to the homepage to view the change.</p>
+					}
+					else if (ViewBag.Flag == 2) {
+						<p id="newBannerSuccess">The homepage newsletter has been successfully updated! Go to the homepage to view the change.</p>
+					}
+
+					<label for="mainBanners" class="mt-5">Select what you would like the main banner to say below:</label>
+
+					<!--display dropdown list of main banners-->
+					<select name="mainBanners" id="mainBanners" class="form-select mt-1 mb-4">
+						@foreach (var item in Model.MainBanners) {
+							<option value="@item.BannerID">@item.Banner</option>
+						}
+						<option value="new">Enter a new banner</option>
+					</select>
+
+					<textarea name="newBanner" id="newBanner" style="display:none" class="form-control mt-2 mb-4"></textarea>
+
+					<button name="btnSubmit" value="submitNewBanner" class="button-action">Submit Change</button>
+
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<th colspan="2">
+				Modify Newsletter
+			</th>
+		</tr>
+		<tr>
+			<td>
+		@if (Model.CurrentNewsletter != null) {
+			if (Model.CurrentNewsletter.ImageID > 0) {
+				<div class="news-profile-image-container">
+					<img class="news-profile-thumbnail" src="@string.Concat("data:Image/"
+						, Model.CurrentNewsletter.FileExtension, ";base64,"
+						, Model.CurrentNewsletter.BytesBase64)" />
+				</div>
+			}
+		}
+		</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<select name="existingNewsletters" id="existingNewsletters" class="form-select mt-1 mb-4">
+					<option value="default">Select a newsletter...</option>
+					@foreach (var item in Model.ExistingNewsletters) {
+						<option value="@item.ImageID">@item.FileName</option>
+					}
+					<option value="new">Upload a New Newsletter</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="file" id="newNewsletter" name="Newsletter" style="display:none" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<button name="btnSubmitNewsletter" value="SubmitNewsletter" id="newNewsletter">Submit Change</button>
+			</td>
+		</tr>
+	}
+</table>
+}
+
+
+<script>
+	// get id of new banner message
+	let x = document.getElementById("newBannerSuccess");
+
+	// remove new banner message after it has displayed for 5 seconds
+	setTimeout(function () { x.style.display = 'none' }, 5000);
+
+	// display textarea if option with value "new" is chosen in drop down
+	$('#mainBanners').on('change', function () {
+		$('#newBanner').css('display', (this.value === 'new') ? 'block' : 'none');
+	});
+
+	// display textarea if option with value "new" is chosen in drop down
+	$('#existingNewsletters').on('change', function () {
+		$('#newNewsletter').css('display', (this.value === 'new') ? 'block' : 'none');
+	});
+</script>
+
+

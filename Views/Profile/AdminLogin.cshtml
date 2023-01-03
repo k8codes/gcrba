@@ -1,0 +1,48 @@
+﻿@model GCRBA.Models.User
+
+@{
+	ViewBag.Title = "Admin Login";
+}
+
+<!--if user is authenticated, they're already logged in, so don't show log in interface again-->
+@if (Model.IsAuthenticated)
+{
+	<p>You are already logged in.</p>
+} else
+{
+	<div class="container col-md-4">
+		<h2 class="mt-5">@ViewBag.Title</h2>
+
+		<!--if UID is 0, user is not logged in, and will be shown login page-->
+		@using (Html.BeginForm(FormMethod.Post))
+		{
+			if (Model.ActionType == GCRBA.Models.User.ActionTypes.RequiredFieldMissing)
+			{
+				<div class="login-error">
+					<i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+					All fields are required.
+				</div>
+			}
+
+			if (Model.ActionType == GCRBA.Models.User.ActionTypes.LoginFailed)
+			{
+				<div class="login-error">
+					<i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+					Invalid username and/or password.
+				</div>
+			}
+
+			<div class="mt-5 mb-4">
+				@Html.LabelFor(model => model.strUsername, new { @class = "form-label" })
+				@Html.TextBoxFor(model => model.strUsername, new { @autofocus = "autofocus", @class = "form-control" })
+			</div>
+			<div class="mb-4">
+				@Html.LabelFor(model => model.strPassword, new { @class = "form-label" })
+				@Html.TextBoxFor(model => model.strPassword, new { type = "password", @class = "form-control" })
+			</div>
+			<div class="mb-3">
+				<button id="btnLogin" name="btnSubmit" value="login" class="button-action">Login</button>
+			</div>
+		}
+	</div>
+}

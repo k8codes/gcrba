@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "type": "mssql",
+      "connectionId": "GCRBA_DB_ConnectionString"
+    }
+  }
+}

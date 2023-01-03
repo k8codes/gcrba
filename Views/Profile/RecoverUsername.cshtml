@@ -1,0 +1,57 @@
+﻿
+@model GCRBA.Models.Recovery
+
+@{
+	ViewBag.Title = "Recover Username";
+	Layout = null;
+}
+<body onload="checkEmail()">
+	<input type="hidden" value=@Model.Email id="hiddenEmail" />
+
+	@if (Model.actionType == GCRBA.Models.Recovery.ActionTypes.NoEmailFound) {
+		<div class="login-error">
+			<i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+			Sorry, no matching user recorded with email: @Model.Email
+		</div>
+	}
+
+	<form method='post' action='/Profile/RecoverUsername' onsubmit=checkAgain()>
+		<h1>Username Recovery</h1>
+		<br>
+		<p>Please enter the email associated to this account below</p>
+		<br>
+		<label>Email Address:</label><input type='text' id='recoverUsernameByEmail' name='recoverUsernameByEmail' />
+		<br><br>
+		<button name='btnSubmit' value='submit' class='mt - 2 mb - 2'>Submit</button>
+	</form>
+</body>
+
+<script>
+	var hiddenEmail = document.getElementById('hiddenEmail').value;
+
+	function checkEmail() {
+		if (hiddenEmail != null && hiddenEmail != "") {
+			alert('Thank you! Username has been sent to ' + hiddenEmail);
+			//setTimeout(closeWindow, 5000);
+			window.close();
+		}
+	}
+		/*
+		alert(hiddenEmail)
+		if (hiddenEmail != null && hiddenEmail != "") {
+			sleep(5000)
+			window.close()
+		}
+		*/
+
+	function checkAgain() {
+		window.location.reload();
+	}
+
+	/*
+	function closeWindow() {
+		window.close();
+	}
+	*/
+</script>
+

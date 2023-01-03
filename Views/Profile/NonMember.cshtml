@@ -1,0 +1,28 @@
+﻿@model GCRBA.Models.User
+
+@{
+	ViewBag.Title = "Non-Member";
+}
+@using (Html.BeginForm())
+{
+
+	if (!Model.IsAuthenticated)
+	{
+		<p>Please log in to view this page.</p>
+	} else
+	{
+		if (Model.Notification.UnreadNotifications == true)
+		{
+			<div class="w-100 text-start mt-4">
+				<button id="notification" name="btnSubmit" value="viewNotifications" class="btn btn-link">New Notification(s) <i class="fa-solid fa-circle-exclamation"></i></button>
+			</div>
+		} else
+		{
+			<div class="w-100 text-start mt-4">
+				<button id="notificationNoUnread" name="btnSubmit" value="viewNotifications" class="btn btn-link">Notifications</button>
+			</div>
+		}
+
+		<button name="btnSubmit" value="editProfile" class="button-action">Edit Profile</button>
+	}
+}

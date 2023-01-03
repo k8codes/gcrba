@@ -1,0 +1,78 @@
+﻿@model GCRBA.Models.User
+@{
+	ViewBag.Title = "Find Your Next Favorite Bakery";
+}
+
+<div id="site-banner" class="some-spacing">
+	<h2>@ViewBag.Title</h2>
+</div>
+<style>
+	.center {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	#content-locked {
+		border: 1px solid gray;
+		-webkit-border-radius: 0.3em;
+		-moz-border-radius: 0.3em;
+		border-radius: 0.3em;
+		background-color: lightyellow;
+		padding: 1em;
+		margin-bottom: 1em;
+	}
+
+	#label {
+		font-weight: bold;
+	}
+	table{
+		width: 100%;
+		background-color:saddlebrown;
+	}
+	td{
+		color: lightgoldenrodyellow;
+	}
+	iframe {
+		width: 100%;
+		height: 850px;
+	}
+
+	@@media only screen and (max-width: 90px)
+	{
+		iframe{
+			width: 100%;
+			height: 300px;
+		}
+	}
+</style>
+
+@if (true) {
+	@Html.Partial("UserTabMenu")
+	if (Model.isMember == 1 || Model.isAdmin == 1) {
+		<div class="some-spacing">
+			<table class="center">
+				<tr>
+					<td class="center">
+						<h3 id="label" class="text-center">Bakery Locations</h3>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<iframe frameborder="0" scrolling="no" marginheight="0" marginwidth="0"
+							src="https://cstatebakers.maps.arcgis.com/apps/webappviewer/index.html?id=29fe9a50bad04e0086dd0d399d1a5c2d" allow='geolocation'>
+						</iframe>
+					</td>
+				</tr>
+			</table>
+		</div>
+	}
+	else {
+		<p>Must be logged in as a member/admin to search for bakeries by location</p>
+	}
+}
+
+<script>
+	$(document).ready(function () {
+		SetActiveMenus('bakery', 'map');
+	});
+</script>

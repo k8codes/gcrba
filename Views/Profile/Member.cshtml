@@ -1,0 +1,38 @@
+﻿
+@{
+	ViewBag.Title = "Member Portal";
+}
+
+@if (Model.isMember == 0)
+{
+	@Html.Partial("MemberOnly");
+
+} else
+{
+	using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "mx-auto" }))
+	{
+		@*if (Model.Notifications.Count > 0)
+			{
+				<button name="btnSubmit" value="viewNotifications" class="button-action mb-3">You have new notification(s) <i class="fa-solid fa-circle-exclamation fa-xl"></i></button>
+			}*@
+		if (Model.Notification.UnreadNotifications == true)
+		{
+			<div class="w-100 text-start mt-4">
+				<button id="notification" name="btnSubmit" value="viewNotifications" class="btn btn-link">New Notification(s) <i class="fa-solid fa-circle-exclamation"></i></button>
+			</div>
+		} else
+		{
+			<div class="w-100 text-start mt-4">
+				<button id="notificationNoUnread" name="btnSubmit" value="viewNotifications" class="btn btn-link">Notifications</button>
+			</div>
+		}
+
+		<h2 class="mt-4 mb-5">Hello,  @Model.FirstName. Thank you for being a member of the GCRBA.</h2>
+
+
+		<button class="w-75 mb-2 button-action" name="btnSubmit" value="editProfile">Edit Profile</button><br />
+		<button class="w-75 mb-2 button-action" name="btnSubmit" value="editCompanyInfo">Edit Company</button><br />
+		<button class="w-75 mb-2 button-action" name="btnSubmit" value="editLandingPage">Upload Photos</button><br />
+	}
+
+}

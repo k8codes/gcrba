@@ -1,0 +1,217 @@
+﻿@model GCRBA.Models.User
+@{
+    ViewBag.Title = "GCRBA Member Form";
+}
+<style>
+    td{
+        text-align: center;
+    }
+</style>
+<div id="site-banner" class="some-spacing">
+    <h2>@ViewBag.Title</h2>
+</div>
+@using (Html.BeginForm(FormMethod.Post))
+{
+    if (Model.ActionType == GCRBA.Models.User.ActionTypes.RequiredFieldMissing)
+    {
+        <div id="content-locked">
+            <i class="fad fa-exclamation-trangle fa-2x"></i>
+            <h2><span >Please enter data in all fields.</span></h2>
+        </div>
+    }
+
+    if (Model.ActionType == GCRBA.Models.User.ActionTypes.DuplicateUsername)
+    {
+        <div id="content-locked">
+
+            <i class="fad fa-exclamation-trangle fa-2x"></i>
+            <h2><span>That USER NAME has already been used. To sign up you must use a different USER NAME.</span></h2>
+        </div>
+    }
+
+    if (Model.ActionType == GCRBA.Models.User.ActionTypes.DuplicateEmail)
+    {
+        <div id="content-locked">
+
+            <i class="fad fa-exclamation-trangle fa-2x"></i>
+            <h2><span>That EMAIL has already been used. To sign up you must use a different EMAIL.</span></h2>
+        </div>
+    }
+
+<div>
+
+    @if (Model.isMember == 0 && Model.UID > 0)
+    {
+        <p>Hello @Model.strUsername, you are logged in as a non-member.</p>
+        <div>
+            Please fill out this form to submit your application to become a member of the
+            Greater Cincinnati Retail Bakers Association!
+        </div>
+    }
+
+    else if (Model.isMember == 1 && Model.UID > 0)
+    {
+        <div id="site-banner" class="some-spacing">
+            <h2>Hello @Model.strUsername, you are already a member of the GCRBA!</h2>
+        </div>
+    }
+
+    else if (Model.UID == 0)
+    {
+       <div id="site-banner" class="some-spacing">
+            Please fill out this form to submit your application to become a member of the
+            Greater Cincinnati Retail Bakers Association!
+       </div>
+    }
+
+    <table class="some-spacing">
+        <tr>
+            <td>
+    <div>
+        <!-- Member First Name -->
+        <div>
+            <div>@Html.Label("First Name")</div>
+            <div>
+                @Html.TextBoxFor(model => model.FirstName, new
+                {
+                    @name = "Firstname",
+                @Value = Model.FirstName,
+                @required=true,
+                @autofocus = "autofocus"
+                })
+            </div>
+        </div>
+
+        <!-- Member Last Name -->
+        <div>
+            <div>@Html.Label("Last Name")</div>
+            <div>
+                @Html.TextBoxFor(model => model.LastName, new
+				{
+			   @name = "Lastname",
+			   @required = true,
+			   @Value = @Model.LastName
+		   })
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <!-- Phone -->
+        <div>
+            <div>@Html.Label("Phone")</div>
+            <div>
+                (@Html.TextBoxFor(model => model.userPhone.AreaCode, new { @Style = "width: 75px", @minlength =3, @maxlength=3, @required=true, @Value = Model.userPhone.AreaCode })) @Html.TextBoxFor(model => model.userPhone.Prefix, new { @Style = "width: 75px", @minlength = 3, @maxlength = 3, @required = true, @Value = Model.userPhone.Prefix })-@Html.TextBoxFor(model => model.userPhone.Suffix, new { @Style = "width: 75px", @minlength = 4, @maxlength = 4, @required = true, @Value = Model.userPhone.Suffix })
+            </div>
+        </div>
+
+        <!-- Address -->
+        <div>
+            <div>@Html.Label("Address")</div>
+            <div>
+                @Html.TextBoxFor(model => model.Address, new { @required = true })
+            </div>
+        </div>
+
+        <!-- City -->
+        <div>
+            <div>@Html.Label("City")</div>
+            <div>
+                @Html.TextBoxFor(model => model.City, new { @required = true })
+            </div>
+        </div>
+
+        <!-- State -->
+        <div>
+            <div>@Html.Label("State")</div>
+            <div>
+                <!--View model?-->
+                <div id="label">@Html.LabelFor(model => model.State, "State")*</div>
+                @Html.DropDownListFor(model => model.intState, new SelectList(Model.lstStates, "intStateID", "strState"))
+            </div>
+        </div>
+
+        <!-- Zip -->
+        <div>
+            <div>@Html.Label("Zip")</div>
+            <div>
+                @Html.TextBoxFor(model => model.Zip, new { @required = true })
+            </div>
+        </div>
+
+
+        @if (Model.UID == 0)
+        {
+            <!-- Email -->
+            <div>@Html.Label("E-mail")</div>
+            <div>
+                @Html.TextBoxFor(model => model.Email, new
+				{
+			   @name = "Email",
+			   @required = true,
+			   @Value = @Model.Email
+		   })
+            </div>
+
+            <!-- Username -->
+            <div>@Html.Label("Username")</div>
+            <div>
+                @Html.TextBoxFor(model => model.strUsername, new
+				{
+			   @name = "Username",
+			   @required = true,
+			   @Value = @Model.strUsername
+		   })
+            </div>
+
+            <!-- Password -->
+            <div>@Html.Label("Password")</div>
+            <div>
+                @Html.TextBoxFor(model => model.strPassword, new
+                {
+                    @name = "Password",
+                    @required = true,
+                @Value = @Model.strPassword,
+                type = "password"
+                })
+            </div>
+        }
+        
+    
+        <!-- Membership Type -->
+        <div class="section">
+            <div>@Html.Label("Membership Type")</div>
+            <div class="some-spacing">
+                @Html.RadioButtonFor(model => model.MemberShipType, "Associate", new {@name="membershipType", @required=true, @selected=true })@Html.Label("Associate - $10") |
+                @Html.RadioButtonFor(model => model.MemberShipType, "Business", new { @name = "membershipType" })@Html.Label("Business - $20") |
+                @Html.RadioButtonFor(model => model.MemberShipType, "Allied", new { @name = "membershipType" })@Html.Label("Allied - $100")
+            </div>
+        </div>
+        <!-- payment type -->
+        <div class="some-spacing">
+            @Html.RadioButtonFor(model => model.PaymentType, "Zelle", new { @name = "paymentType", @required=true, value = 1})@Html.Label("Zelle") |
+            @Html.RadioButtonFor(model => model.PaymentType, "Check", new { @name = "paymentType", @required=true, value = 2})@Html.Label("Check")
+        </div>
+    </div>
+    </td>
+    </tr>
+    </table>
+
+
+
+
+    <div>
+        <button id="btnSignUp" name="btnSubmit" value="submit" class="button-action"><i class="fas fa-user-plus"></i> Submit </button>
+    </div>
+    
+</div>
+
+}
+
+
+
+
+
+
+
+

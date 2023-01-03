@@ -1,0 +1,74 @@
+﻿@using GCRBA.ViewModels
+@model ProfileViewModel
+
+
+@{
+	ViewBag.Title = "Add/Delete Categories";
+}
+
+@if (Model.User.isMember == 0)
+{
+	@Html.Partial("MemberOnly");
+
+} else
+{
+	<h2>@ViewBag.Title</h2>
+
+	if (Model.Category.ActionType == GCRBA.Models.CategoryItem.ActionTypes.InsertSuccessful)
+	{
+		@Html.Partial("ChangeSuccessful");
+	}
+
+	if (Model.Category.ActionType == GCRBA.Models.CategoryItem.ActionTypes.DeleteSuccessful)
+	{
+		@Html.Partial("ChangeSuccessful");
+	}
+
+	using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "w-100 mx-auto" }))
+	{
+		<div id="add">
+			@if (Model.Locations.Count > 0)
+			{
+				<div id="locations" class="d-inline-flex m-3 row">
+					<label for="locations" class="form-label">Choose Location:</label>
+					<select name="locations" class="form-control" required>
+						@foreach (var item in Model.Locations)
+						{
+							<option value="@item.LocationID">@item.Address @item.City, @item.State @item.Zip</option>
+						}
+					</select>
+					<div class="row">
+						<div class="col">
+							<button name="btnSubmit" value="addCategories" class="button-action mt-3">Add Categories</button>
+							<button name="btnSubmit" value="deleteCategories" class="button-action mt-3">Delete Categories</button>
+						</div>
+					</div>
+				</div>
+				if (Model.Location.LocationID > 0)
+				{
+					<div class="d-inline-flex m-3 row">
+						<label for="categories" class="form-label">Select Category(s):</label>
+
+						<select name="categories" class="form-control" multiple>
+							@foreach (var item in Model.Categories)
+							{
+								<option value="@item.ItemID">@item.ItemDesc</option>
+							}
+						</select>
+						<div class="row">
+							<div class="col">
+								<button name="btnSubmit" value="submit" class="button-action mt-3">Submit</button>
+								<button name="btnSubmit" value="cancel" class="button-action mt-3">Cancel</button>
+							</div>
+						</div>
+					</div>
+				}
+			} else
+			{
+				@Html.Partial("NoLocations");
+				<button name="btnSubmit" value="addLocation">Add Location</button>
+			}
+		</div>
+
+	}
+}

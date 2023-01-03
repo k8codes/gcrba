@@ -1,0 +1,343 @@
+﻿@model GCRBA.Models.SearchResults
+
+<style>
+	.center {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	#content-locked {
+		border: 1px solid gray;
+		-webkit-border-radius: 0.3em;
+		-moz-border-radius: 0.3em;
+		border-radius: 0.3em;
+		background-color: lightyellow;
+		padding: 1em;
+		margin-bottom: 1em;
+	}
+
+	#label {
+		font-weight: bold;
+	}
+
+	#phone {
+		width: 50px;
+	}
+
+	#results {
+		width: 700px;
+	}
+
+	table {
+		border-collapse: collapse;
+		border-spacing: 0;
+		width: 650px;
+		height: 200px;
+		border: 1px solid black;
+
+	}
+
+	#table-scroll {
+		overflow-y: scroll;
+		height: 443px;
+		display: block;
+		border: 1px solid black;
+	}
+
+	.center {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	#topleft {
+		text-align: left;
+		vertical-align: top;
+	}
+
+	#text-center {
+		text-align: center;
+	}
+
+	#label-1 {
+		font-weight: bold;
+		text-decoration: underline;
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	.row {
+		margin-left: -5px;
+		margin-right: -5px;
+	}
+
+	.column {
+		float: left;
+		width: 50%;
+		padding: 5px;
+	}
+
+	.column-wide-x2 {
+		float: left;
+		width: 66%;
+		padding: 5px;
+	}
+
+	th, td {
+		text-align: left;
+	}
+
+	tr:nth-child(odd) {
+		background-color: lightgoldenrodyellow;
+	}
+
+	tr:nth-child(even) {
+		background-color: burlywood
+	}
+
+	/* Clearfix (clear floats) */
+	.row::after {
+		content: "";
+		clear: both;
+		display: table;
+	}
+
+	.disabled{
+		color: #999;
+	}
+	@@media only screen and (max-width: 80em) {
+		.column {
+			width: 100%;
+		}
+	}
+</style>
+@{
+	ViewBag.Title = "Find Your Next Favorite Bakery";
+}
+
+<div id="site-banner" class="some-spacing">
+	<h2 id="">@ViewBag.Title</h2>
+</div>
+
+@Html.Partial("UserTabMenu")
+
+@using (Html.BeginForm("Index", "Bakery", FormMethod.Post)) {
+
+	<div class="row">
+		<div class="column">
+			<table>
+				<tr>
+					<th id="label" colspan="6">
+						Specialty Product Categories
+					</th>
+				</tr>
+				<tr>
+					<td>
+						@Html.CheckBoxFor(models => models.Donuts.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Donuts, "Donuts")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.Bagels.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Bagels, "Bagels")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.Muffins.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Muffins, "Muffins")
+					</td>
+				</tr>
+				<tr>
+
+					<td>
+						@Html.CheckBoxFor(models => models.Cupcakes.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Cupcakes, "Cupcakes")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.IceCream.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.IceCream, "Ice Cream")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.WeddingCakes.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.WeddingCakes, "Wedding Cakes")
+					</td>
+				</tr>
+				<tr>
+					<td>
+						@Html.CheckBoxFor(models => models.Breads.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Breads, "Breads")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.DecoratedCakes.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.DecoratedCakes, "Decorated Cakes")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.FineCandies.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.FineCandies, "Fine Candies & Chocolates")
+					</td>
+				</tr>
+				<tr>
+					<td>
+						@Html.CheckBoxFor(models => models.Cookies.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Cookies, "Cookies")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.Desserts.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Desserts, "Desserts/Tortes")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.Full.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Full, "Full-line Bakery")
+					</td>
+				</tr>
+				<tr>
+					<td>
+						@Html.CheckBoxFor(models => models.Deli.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Deli, "Deli/Catering")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.Other.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Other, "Carryout Deli")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.Wholesale.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Wholesale, "Wholesale")
+					</td>
+				</tr>
+				<tr>
+					<td>
+						@Html.CheckBoxFor(models => models.Delivery.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Delivery, "Delivery (3rd Party)")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.Shipping.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Shipping, "Shipping")
+					</td>
+					<td>
+						@Html.CheckBoxFor(models => models.Online.blnAvailable)
+					</td>
+					<td>
+						@Html.LabelFor(model => model.Online, "Online Ordering")
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="column">
+			<table id="table-scroll">
+				<tr>
+					<th>Search Results:</th>
+				</tr>
+				@if (Model.lstLocations != null) {
+					foreach (GCRBA.Models.NewLocation member in Model.lstLocations) {
+						if (member.isMember == true) {
+							<tr>
+								<td>
+									<u></u>
+									<div>
+										<button class="button-cancel" id="results" name="btnSubmit" value=@member.lngLocationID><strong><u>@member.LocationName | @member.StreetAddress, @member.City @member.State | @member.selectedGood</u></strong></button>
+									</div>
+								</td>
+							</tr>
+						}
+					}
+					foreach(GCRBA.Models.NewLocation notMember in Model.lstLocations) {
+						if (notMember.isMember == false) {
+							<tr>
+								<td>
+									<u></u>
+									<div>
+										<button class="button-cancel" id="results" name="btnSubmit" value=@notMember.lngLocationID><u>@notMember.LocationName | @notMember.StreetAddress, @notMember.City @notMember.State | @notMember.selectedGood</u></button>
+									</div>
+								</td>
+							</tr>
+						}
+					}
+				}
+			</table>
+		</div>
+	</div>
+
+	<br />
+	<div>
+		<button class="button-action" id="btnSearch" name="btnSubmit" value="search">Search</button>
+	</div>
+	<br />
+
+
+
+
+}
+
+
+@using (Html.BeginForm()) {
+	GCRBA.Models.User u = new GCRBA.Models.User();
+	u = u.GetUserSession();
+
+	if (u.IsAuthenticated) {
+
+		<div class="some-spacing">
+			<button class="button-action" id="btnAdd" name="btnSubmit" value="addLocation">Add a Bakery!</button>
+		</div>
+	}
+	else {
+		<div class="some-spacing">
+			<button type="button" id="btnDisabled" onclick="showMessage()">Add a Bakery!</button>
+		</div>
+	}
+
+}
+
+
+
+<script>
+	var message = `Please login to add a new bakery location! 
+Press OK to be redirect to login screen.`
+	
+	function showMessage() {
+		//alert(message);
+		if (confirm(message)) {
+		location.href="/Profile/Login"};
+	}
+
+	$('#btnDisabled').click(function () {
+		$('#btnDisabled').prop('disabled', true).addClass('disabled');
+	});
+
+	$(document).ready(function () {
+		SetActiveMenus('bakery', 'index');
+	});
+</script>
+

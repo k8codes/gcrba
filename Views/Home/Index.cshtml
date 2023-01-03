@@ -1,0 +1,54 @@
+@model GCRBA.Models.Homepage
+
+@{
+	ViewBag.Title = ViewBag.MainBanner;
+}
+
+<style>
+	#img-news {
+		width: 100%;
+	}
+</style>
+
+<div id="site-banner">
+	<h2>@ViewBag.MainBanner</h2>
+</div>
+@using (Html.BeginForm()) {
+	<br />
+	if (Model.newsletter != null) {
+		if (Model.newsletter.ImageID > 0) {
+			<!--img id="img-news" src="~/Content/Photos/GCRBANews.jpg" />-->
+			<img id="img-news" src="@string.Concat("data:Image/"
+								   ,Model.newsletter.FileExtension, ";base64,"
+								   ,Model.newsletter.BytesBase64)"/>
+		}
+
+	}
+
+	<!--
+	<div class="topcorner">
+		<button class="button-action" id="btnJoin" name="btnSubmit" value="join">Join the GCRBA!</button>
+		<button class="button-action" id="btnLogin" name="btnSubmit" value="login">Login</button>
+		<button class="button-action" id="btnAdminLogin" name="btnSubmit" value="admin">Admin Login</button>
+	</div>
+	-->
+	/*
+	<div class=left>
+		<div>
+			<button class="button-action" id="btnBakery" name="btnSubmit" value="bakery" style="width: 250px"><i class="fal fa-birthday-cake"></i>Find a Bakery</button>
+		</div>
+		<div>
+			<button class="button-action" id="btnBakery" name="btnSubmit" value="vendor" style="width: 250px"><i class="fal fa-birthday-cake"></i>Connect with Vendors</button>
+		</div>
+		<div>
+			<button class="button-action" id="btnBakery" name="btnSubmit" value="education" style="width: 250px"><i class="fal fa-birthday-cake"></i>Learn to Bake!</button>
+		</div>
+	</div>
+	*/
+	<br />
+}
+<script>
+	$(document).ready(function () {
+		SetActiveMenus('home');
+	});
+</script>

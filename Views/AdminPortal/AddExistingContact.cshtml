@@ -1,0 +1,67 @@
+﻿@using GCRBA.ViewModels
+@model AdminVM
+
+<h2>Add Existing Contact Person to Location for: @Model.Company.Name</h2>
+
+@if (Model.User.isAdmin == 0)
+{
+    @Html.Partial("AdminOnly");
+}
+else
+{
+    if (Model.ContactPerson.ActionType == GCRBA.Models.ContactPerson.ActionTypes.InsertSuccessful)
+    {
+        <p>Change successful.</p>
+    }
+
+<div class="container card bg-light w-50 p-4">
+    @using (Html.BeginForm(FormMethod.Post))
+    {
+        <div id="contacts">
+            <label for="contacts" class="form-label">Contacts</label>
+            <select name="contacts" class="form-control">
+                @if (Model.ContactPerson.lngContactPersonID != 0)
+                {
+                    foreach (var item in Model.Contacts)
+                    {
+                        if (item.lngContactPersonID == Model.ContactPerson.lngContactPersonID)
+                        {
+                            <option value="@item.lngContactPersonID" class="contacts" selected>@item.strFullName</option>
+                        }
+                        else
+                        {
+                            <option value="@item.lngContactPersonID" class="contacts">@item.strFullName</option>
+                        }
+                    }
+                }
+                else
+                    {
+                        foreach (var item in Model.Contacts)
+                        {
+                            <option value="@item.lngContactPersonID">@item.strFullName</option>
+                        }
+                    }
+            </select>
+            <button name="btnSubmit" class="mt-2" value="getLocations" id="chooseContact">Get Locations</button>
+        </div>
+
+        if (Model.ContactPerson.lngContactPersonID != 0)
+        {
+            if (Model.Locations.Count > 0)
+            {
+                @Html.Partial("Locations");
+            }
+            else
+            {
+                @Html.Partial("ErrorNoLocationsForContact");
+            }
+        }
+
+        <div class="mt-5">
+            <button name="btnSubmit" value="submit">Submit</button>
+            <button name="btnSubmit" value="cancel" formnovalidate>Cancel</button>
+        </div>
+    }
+</div>
+}
+

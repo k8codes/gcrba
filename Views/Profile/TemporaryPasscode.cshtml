@@ -1,0 +1,19 @@
+﻿@model GCRBA.Models.Recovery
+@{
+	ViewBag.Title = "Temporary Passcode";
+}
+
+@using (Html.BeginForm(FormMethod.Post)) {
+		<div class="container col-md-4">
+			<h2 class="mt-5">@ViewBag.Title</h2>
+			<p>Please enter temporary passcode below to change your password</p>
+			<div class="mt-5 mb-4">
+				@Html.Label("Temporary Code", new { @class = "form-label" })
+				@Html.TextBoxFor(model => model.TemporaryCode, new {@type="number", @autofocus = "autofocus", @class = "form-control" })
+			</div>
+			<div class="mb-3">
+				<button id="btnSubmit" name="btnSubmit" value="submit" class="button-action">Submit</button>
+			</div>
+		</div>
+}
+

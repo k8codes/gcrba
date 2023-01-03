@@ -1,0 +1,35 @@
+﻿@using GCRBA.ViewModels
+@model ProfileViewModel
+
+@{
+	ViewBag.Title = "Edit Company Information";
+}
+
+@if (Model.User.isMember != 1)
+{
+	@Html.Partial("MemberOnly");
+} else
+{
+	<h2>@ViewBag.Title</h2>
+
+	using (Html.BeginForm(null, null, null, FormMethod.Post, new { @class = "mx-auto w-50" }))
+	{
+		if (Model.Company.CompanyID > 0)
+		{
+			<p>Member account connected with: @Model.Company.Name</p>
+			<div class="row">
+				<button name="btnSubmit" value="addLocation" class="button-action m-1">Add New Location/Add New Company</button>
+				<!--<button name="btnSubmit" value="removeCompany" class="button-action m-1">Remove Company from Profile</button>-->
+				<!--<button name="btnSubmit" value="addCompany" class="button-action m-1">Add Existing Company to Profile</button>-->
+				<button name="btnSubmit" value="editCompany" class="button-action m-1">Edit General Company Information</button>
+				<button name="btnSubmit" value="editLocation" class="button-action m-1">Edit Location(s)</button>
+				<button name="btnSubmit" value="deleteLocation" class="button-action m-1">Delete Location(s)</button>
+				<button name="btnSubmit" value="editSpecials" class="button-action m-1">Edit Specials</button>
+				<button name="btnSubmit" value="editCategories" class="button-action m-1">Edit Categories</button>
+			</div>
+		} else
+		{
+			<p>You are not currently associated with any companies. Contact the admin to add a company to your account.</p>
+		}
+	}
+}
