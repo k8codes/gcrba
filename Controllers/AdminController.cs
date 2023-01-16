@@ -495,6 +495,7 @@ namespace GCRBA.Controllers
             // get banners list 
             vm.MainBanners = GetBannersList(vm);
             vm.ExistingNewsletters = GetNewslettersList(vm);
+            vm.CurrentNewsletter = GetCurrentNewsletter(vm);
 
             // get current main banner 
             vm.MainBanner = new MainBanner();
@@ -567,6 +568,12 @@ namespace GCRBA.Controllers
                     image.UpdateCurrentNewsletter();
                     ViewBag.Flag = 2;
                 }
+			}
+			if (col["btnNewsletter"] == "send") {
+                if (col["currentNewsletter"] != null) {
+                    vm.CurrentNewsletter = GetCurrentNewsletter(vm);
+                }
+                vm.sendCurrentNewsletter(vm);
 			}
 
             vm.CurrentNewsletter = GetCurrentNewsletter(vm);

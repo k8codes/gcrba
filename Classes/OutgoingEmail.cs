@@ -5,9 +5,12 @@ using System.Web;
 using System.Net.Mail;
 using System.Net.Mime;
 using System.IO;
+using GCRBA.Classes;
 
 namespace GCRBA {
-    public static class OutgoingEmail {
+    public class OutgoingEmail {
+
+        private static String gmailAppCredentialEncrypted = StaticObfuscatePwd.GetSystemPassword("Gmail");
 
         public static void SendUsernameRecovery(Models.CredentialRecovery credentialInfo) {
             String URL = "https://gcrbaonline.azurewebsites.net/Profile/Login"; //These need to be more dynamic for the root
@@ -31,7 +34,7 @@ namespace GCRBA {
                 smtp.Host = "smtp.gmail.com";
                 smtp.Port = 587;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", "dxvybeahxwkbvpek");
+                smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", StaticObfuscatePwd.getSimpleDecrypt(gmailAppCredentialEncrypted));
                 smtp.EnableSsl = true;
                 smtp.Send(mailMessage);
             }
@@ -59,7 +62,7 @@ namespace GCRBA {
                 smtp.Host = "smtp.gmail.com";
                 smtp.Port = 587;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", "dxvybeahxwkbvpek");
+                smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", StaticObfuscatePwd.getSimpleDecrypt(gmailAppCredentialEncrypted));
                 smtp.EnableSsl = true;
                 smtp.Send(mailMessage);
             }
@@ -69,7 +72,7 @@ namespace GCRBA {
             do {
                 GCRBA.Models.User user = new Models.User();
                 user = user.GetUserSession();
-                GCRBA.Models.LocationMailModel locationMailModel = new Models.LocationMailModel();
+                GCRBA.Models.LocationAdminRequest locationMailModel = new Models.LocationAdminRequest();
 
                 locationMailModel.UserEmail = user.Email;
                 locationMailModel.UserFullName = user.LastName + ", " + user.FirstName;
@@ -208,7 +211,7 @@ namespace GCRBA {
                 string BizPhone = '(' + locationMailModel.Content.lstLocations[i].BusinessPhone.AreaCode + ") " + locationMailModel.Content.lstLocations[i].BusinessPhone.Prefix + '-' + locationMailModel.Content.lstLocations[i].BusinessPhone.Suffix;
 
                 string body = string.Empty;
-                using (StreamReader reader = new StreamReader(HttpContext.Current.Server.MapPath("\\Views\\Shared\\LocEmailTemplate.html"))) {
+                using (StreamReader reader = new StreamReader(HttpContext.Current.Server.MapPath("\\Views\\EmailTemplates\\LocEmailTemplate.html"))) {
                     //"C:\\Users\\winsl\\OneDrive\\Desktop\\Capstone\\MVC\\Views\\Shared\\LocEmailTemplate.html"
                     //"E:\\Web-Folders\\Students\\Spring\\CPDM-290-200\\CPDM-WinslowS\\Views\\Shared\\LocEmailTemplate.html"
                     //Server.MapPath("~\\Views\\Shared\\LocEmailTemplate.html")
@@ -261,7 +264,7 @@ namespace GCRBA {
                 body = body.Replace("{ShippingStatus}", locationMailModel.Content.lstLocations[i].Shipping.blnAvailable.ToString());
                 body = body.Replace("{OnlineStatus}", locationMailModel.Content.lstLocations[i].Online.blnAvailable.ToString());
 
-                body = body.Replace("{Username}", locationMailModel.UserName);
+                body = body.Replace("{Username}", locationMailModel.From);
                 body = body.Replace("{Title}", locationMailModel.Title);
                 body = body.Replace("{Url}", locationMailModel.Url);
                 body = body.Replace("{Description}", locationMailModel.Description);
@@ -305,7 +308,7 @@ namespace GCRBA {
                 body = body.Replace("{KettleWebURL}", locationMailModel.Content.lstLocations[i].KettleWeb.strURL);
 
                 using (MailMessage mailMessage = new MailMessage()) {
-                    mailMessage.From = new MailAddress(locationMailModel.UserName);
+                    mailMessage.From = new MailAddress(locationMailModel.From);
                     mailMessage.Subject = locationMailModel.Subject;
                     mailMessage.Body = body;
                     mailMessage.IsBodyHtml = true;
@@ -318,7 +321,7 @@ namespace GCRBA {
                     smtp.Host = "smtp.gmail.com";
                     smtp.Port = 587;
                     smtp.UseDefaultCredentials = false;
-                    smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", "dxvybeahxwkbvpek");
+                    smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", StaticObfuscatePwd.getSimpleDecrypt(gmailAppCredentialEncrypted));
                     smtp.EnableSsl = true;
                     smtp.Send(mailMessage);
                 }
@@ -354,7 +357,7 @@ namespace GCRBA {
             }
 
             string body = string.Empty;
-            using (StreamReader reader = new StreamReader(HttpContext.Current.Server.MapPath("~\\Views\\Shared\\MemberEmailTemplate.html"))) {
+            using (StreamReader reader = new StreamReader(HttpContext.Current.Server.MapPath("~\\Views\\EmailTemplates\\MemberEmailTemplate.html"))) {
                 //"C:\\Users\\winsl\\OneDrive\\Desktop\\Capstone\\MVC\\Views\\Shared\\LocEmailTemplate.html"
                 //"E:\\Web-Folders\\Students\\Spring\\CPDM-290-200\\CPDM-WinslowS\\Views\\Shared\\LocEmailTemplate.html"
                 //Server.MapPath("~\\Views\\Shared\\LocEmailTemplate.html")
@@ -373,7 +376,7 @@ namespace GCRBA {
             body = body.Replace("{Description}", memberMailModel.Description);
 
             using (MailMessage mailMessage = new MailMessage()) {
-                mailMessage.From = new MailAddress(memberMailModel.UserName);
+                mailMessage.From = new MailAddress(memberMailModel.From);
                 mailMessage.Subject = memberMailModel.Subject;
                 mailMessage.Body = body;
                 mailMessage.IsBodyHtml = true;
@@ -382,10 +385,54 @@ namespace GCRBA {
                 smtp.Host = "smtp.gmail.com";
                 smtp.Port = 587;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", "dxvybeahxwkbvpek");
+                smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", StaticObfuscatePwd.getSimpleDecrypt(gmailAppCredentialEncrypted));
                 smtp.EnableSsl = true;
                 smtp.Send(mailMessage);
             }
+        }
+        public static void SendNewsletter(Models.SendNewsletterRequest newsletterRequest) {
+            using (MailMessage mailMessage = new MailMessage()) {
+                mailMessage.From = new MailAddress(newsletterRequest.From);
+                mailMessage.Subject = newsletterRequest.Subject;
+                mailMessage.Body = "Please see the GCRBA's new newsletter";
+                LinkedResource LinkedImage = new LinkedResource(HttpContext.Current.Server.MapPath("\\Content\\Photos\\GCRBANews.jpg"));
+                LinkedImage.ContentId = "Newsletter";
+                LinkedImage.ContentType = new ContentType(MediaTypeNames.Image.Jpeg);
+                String htmlBody = @"<img src='cid:" + LinkedImage.ContentId + @"'/>";
+                AlternateView htmlView = AlternateView.CreateAlternateViewFromString(htmlBody, null, MediaTypeNames.Text.Html);
+                htmlView.LinkedResources.Add(LinkedImage);
+                mailMessage.AlternateViews.Add(htmlView);
+                mailMessage.To.Add(new MailAddress(newsletterRequest.Recipient));
+                SmtpClient smtp = new SmtpClient();
+                smtp.Host = "smtp.gmail.com";
+                smtp.Port = 587;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new System.Net.NetworkCredential("gcrbadata@gmail.com", StaticObfuscatePwd.getSimpleDecrypt(gmailAppCredentialEncrypted));
+                smtp.EnableSsl = true;
+                smtp.Send(mailMessage);
+            }
+        }
+
+        private AlternateView Mail_Body() {
+            string path = HttpContext.Current.Server.MapPath(@"Images/photo.jpg");
+            LinkedResource Img = new LinkedResource(path, MediaTypeNames.Image.Jpeg);
+            Img.ContentId = "MyImage";
+            string str = @"  
+            <table>  
+                <tr>  
+                    <td> '" + /*txtmessagebody.Text +*/ @"'  
+                    </td>  
+                </tr>  
+                <tr>  
+                    <td>  
+                      <img src=cid:MyImage  id='img' alt='' width='100px' height='100px'/>   
+                    </td>  
+                </tr></table>  
+            ";
+            AlternateView AV =
+            AlternateView.CreateAlternateViewFromString(str, null, MediaTypeNames.Text.Html);
+            AV.LinkedResources.Add(Img);
+            return AV;
         }
 
     }

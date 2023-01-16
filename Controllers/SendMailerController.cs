@@ -20,7 +20,7 @@ namespace GCRBA.Controllers
         }
 
         [HttpPost]
-        public ActionResult SendLocationEmail(Models.LocationMailModel email, FormCollection col) {
+        public ActionResult SendLocationEmail(Models.LocationAdminRequest email, FormCollection col) {
             int i = 0;
             do {
                 if(col["Content.lstLocations[" + i + "].LocationName"] != null) { 
@@ -198,13 +198,13 @@ namespace GCRBA.Controllers
                     body = body.Replace("{BizYear}", email.Content.lstLocations[i].BizYear);
                     body = body.Replace("{BizBio}", email.Content.lstLocations[i].Bio);
 
-                    body = body.Replace("{Username}", email.UserName);
+                    body = body.Replace("{Username}", email.UserFullName);
                     body = body.Replace("{Title}", email.Title);
                     body = body.Replace("{Url}", email.Url);
                     body = body.Replace("{Description}", email.Description);
 
                     using (MailMessage mailMessage = new MailMessage()) {
-                        mailMessage.From = new MailAddress(email.UserName);
+                        mailMessage.From = new MailAddress(email.Recipient);
                         mailMessage.Subject = email.Subject;
                         mailMessage.Body = body;
                         mailMessage.IsBodyHtml = true;

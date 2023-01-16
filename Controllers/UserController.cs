@@ -125,7 +125,7 @@ namespace GCRBA.Controllers
                     Database db = new Database();
 
                     //Obfuscate username and password prior to saving
-                    u.encryptedUsername = obfuscater.SimpleObfuscateCredentials(u.strUsername);
+                    //u.encryptedUsername = obfuscater.SimpleObfuscateCredentials(u.strUsername);
                     u = obfuscater.ComplexObfuscateCredentials(u.strPassword, u);
 
                     // save action type based on what Save() returns 
@@ -206,7 +206,7 @@ namespace GCRBA.Controllers
                     user.Email = col["Email"];
                     user.strUsername = col["strUsername"];
                     user.strPassword = col["strPassword"];
-                    user.encryptedUsername = obfuscater.SimpleObfuscateCredentials(user.strUsername);
+                    //user.encryptedUsername = obfuscater.SimpleObfuscateCredentials(user.strUsername);
                     user = obfuscater.ComplexObfuscateCredentials(user.strPassword, user);
                 }
 

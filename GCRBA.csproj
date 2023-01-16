@@ -199,8 +199,8 @@
     <Content Include="Scripts\jquery-3.6.0.js" />
     <Content Include="Scripts\jquery.filedrop.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
-    <Content Include="Views\Shared\LocEmailTemplate.html" />
-    <Content Include="Views\Shared\MemberEmailTemplate.html" />
+    <Content Include="Views\EmailTemplates\LocEmailTemplate.html" />
+    <Content Include="Views\EmailTemplates\MemberEmailTemplate.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
@@ -221,11 +221,10 @@
     <Compile Include="Models\Awards.cs" />
     <Compile Include="Models\BakedGoods.cs" />
     <Compile Include="Models\Button.cs" />
-    <Compile Include="Models\CredentialRecoveryMailModel.cs" />
     <Compile Include="Models\MailModels.cs" />
-    <Compile Include="Models\OutgoingEmail.cs" />
+    <Compile Include="Classes\OutgoingEmail.cs" />
     <Compile Include="Models\CompanyMember.cs" />
-    <Compile Include="Models\ExportToCsv.cs" />
+    <Compile Include="Classes\ExportToCsv.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -240,7 +239,6 @@
     <Compile Include="Models\Location.cs" />
     <Compile Include="Models\LocationList.cs" />
     <Compile Include="Models\MainBanner.cs" />
-    <Compile Include="Models\LocationMailModel.cs" />
     <Compile Include="Models\MemberRequest.cs" />
     <Compile Include="Models\NewLocation.cs" />
     <Compile Include="Models\Notification.cs" />
@@ -249,8 +247,6 @@
     <Compile Include="Models\Request.cs" />
     <Compile Include="Models\SaleSpecial.cs" />
     <Compile Include="Models\SearchResults.cs" />
-    <Compile Include="Models\SendLocationEmail.cs" />
-    <Compile Include="Models\SendMemberEmail.cs" />
     <Compile Include="Models\SocialMedia.cs" />
     <Compile Include="Models\State.cs" />
     <Compile Include="Controllers\TroubleshootController.cs" />
@@ -294,7 +290,6 @@
     <Content Include="Views\Education\Index.cshtml" />
     <Content Include="Views\Vendor\Index.cshtml" />
     <Content Include="Views\Bakery\AddNewLocation.cshtml" />
-    <Content Include="Views\Bakery\MemberBakery.cshtml" />
     <Content Include="Views\Bakery\LandingPage.cshtml" />
     <Content Include="Views\User\AddNewUser.cshtml" />
     <Content Include="Scripts\bootstrap.min.js.map" />
@@ -320,9 +315,7 @@
     <Content Include="Views\AdminPortal\DeleteCompany.cshtml" />
     <Content Include="Views\Shared\UpdateSuccessful.cshtml" />
     <Content Include="Views\Shared\AdminOnly.cshtml" />
-    <Content Include="Views\Profile\EditAwards.cshtml" />
     <Content Include="Views\AdminPortal\AddNewLocation.cshtml" />
-    <Content Include="Views\AdminPortal\EditGeneralInfo.cshtml" />
     <Content Include="Views\AdminPortal\DeleteLocation.cshtml" />
     <Content Include="Views\AdminPortal\AddContactPerson.cshtml" />
     <Content Include="Views\AdminPortal\AddExistingContact.cshtml" />
@@ -346,11 +339,9 @@
     <Content Include="Views\AdminPortal\MembershipRequests.cshtml" />
     <Content Include="Views\SendMailer\SendLocationEmailConfirm.cshtml" />
     <Content Include="Views\Shared\DeleteSuccessful.cshtml" />
-    <Content Include="Views\Shared\RequestDenied.cshtml" />
     <Content Include="Views\Profile\UserNotifications.cshtml" />
     <Content Include="Views\Profile\AddNewPhotos.cshtml" />
     <Content Include="Views\Photo\Index.cshtml" />
-    <Content Include="Views\Profile\AddCompany.cshtml" />
     <Content Include="Views\Profile\EditExistingCompany.cshtml" />
     <Content Include="Views\Profile\EditWebsites.cshtml" />
     <Content Include="Views\Profile\EditSocialMedia.cshtml" />
@@ -366,6 +357,8 @@
     <Content Include="Views\EmailTemplates\RecoverPasswordTemplate.cshtml" />
     <Content Include="Views\Profile\TemporaryPasscode.cshtml" />
     <Content Include="Views\Profile\ModifyPassword.cshtml" />
+    <None Include="Properties\PublishProfiles\GCRBAOnlineDev - Web Deploy.pubxml" />
+    <Content Include="Views\EmailTemplates\SendNewsletterRequest.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -77,7 +77,6 @@ namespace GCRBA.Controllers {
                 if (recovery.Email != null && recovery.Email != String.Empty) {
                     recovery.Username = recovery.GetUsername(recovery.Email);
                     if(recovery.Username != null && recovery.Username != String.Empty) {
-                        recovery.Username = obfuscater.SimpleDecrypt(recovery.Username);
                         CredentialRecovery credentialRecovery = new CredentialRecovery();
                         credentialRecovery.Username = recovery.Username;
                         credentialRecovery.Recipient = recovery.Email;
@@ -125,14 +124,14 @@ namespace GCRBA.Controllers {
                         return View(user);
                     }
 
-                    Classes.ObfuscatePwd obfuscater = new Classes.ObfuscatePwd();
-                    user.encryptedUsername = obfuscater.SimpleObfuscateCredentials(user.strUsername);
+                    //user.encryptedUsername = obfuscater.SimpleObfuscateCredentials(user.strUsername);
                    
                     // call Login method on User object
                     // method will either return a User object or null
                     user = user.NonAdminLogin();
 
                     if (user != null && user.UID > 0) {
+                        Classes.ObfuscatePwd obfuscater = new Classes.ObfuscatePwd();
                         bool validated = obfuscater.CheckPassword(Password, user.Password, user.salt);
                         if (validated == true) {
 
@@ -280,7 +279,7 @@ namespace GCRBA.Controllers {
                     if (col["btnSubmit"] == "login")
                     {
                         Classes.ObfuscatePwd obfuscater = new ObfuscatePwd();
-                        user.encryptedUsername = obfuscater.SimpleObfuscateCredentials(user.strUsername);
+                        //user.encryptedUsername = obfuscater.SimpleObfuscateCredentials(user.strUsername);
                         user = obfuscater.ComplexObfuscateCredentials(strPassword, user);
 
                         // call Login method on User object
