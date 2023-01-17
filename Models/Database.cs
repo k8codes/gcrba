@@ -7,19 +7,14 @@ using System.Linq;
 using GCRBA.ViewModels;
 using System.Data.SqlTypes;
 
-namespace GCRBA.Models
-{
+namespace GCRBA.Models {
 
-	public class Database
-	{
+	public class Database {
 
-		public List<Models.State> GetStates()
-		{
-			try
-			{
+		public List<Models.State> GetStates() {
+			try {
 				List<Models.State> lstStates = new List<Models.State>();
-				try
-				{
+				try {
 					DataSet ds = new DataSet();
 					SqlConnection cn = new SqlConnection();
 					if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
@@ -27,20 +22,16 @@ namespace GCRBA.Models
 
 					da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-					try
-					{
+					try {
 						da.Fill(ds);
 					}
-					catch (Exception ex2)
-					{
+					catch (Exception ex2) {
 						throw new Exception(ex2.Message);
 					}
 					finally { CloseDBConnection(ref cn); }
 
-					if (ds.Tables[0].Rows.Count != 0)
-					{
-						foreach (DataRow dr in ds.Tables[0].Rows)
-						{
+					if (ds.Tables[0].Rows.Count != 0) {
+						foreach (DataRow dr in ds.Tables[0].Rows) {
 							State state = new State();
 							state.intStateID = (short)dr["intStateID"];
 							state.strState = (string)dr["strState"];
@@ -52,11 +43,12 @@ namespace GCRBA.Models
 
 				return lstStates;
 			}
-			catch (Exception ex)
-			{
+			catch (Exception ex) {
 				throw new Exception(ex.Message);
 			}
 		}
+
+
 
 		public int GetUserIdFromEmail(String email) {
 			int UserId = 0;
@@ -87,6 +79,51 @@ namespace GCRBA.Models
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
 
+		}
+
+		public List<Models.User> GetSubscriberEmailList() {
+			try {
+				DataSet ds = new DataSet();
+				SqlConnection cn = new SqlConnection();
+
+				// try to connect to database -- throw error if unsuccessful
+				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect.");
+
+				// specify which stored procedure we are using 
+				SqlDataAdapter da = new SqlDataAdapter("GET_SUBSCRIBER_LIST", cn);
+
+				// create new list object with type string  
+				List<Models.User> subscriberList = new List<Models.User>();
+
+				// set command type as stored procedure
+				da.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+				try { da.Fill(ds); }
+				catch (Exception ex) { throw new Exception(ex.Message); }
+				finally { CloseDBConnection(ref cn); }
+
+				if (ds.Tables[0].Rows.Count != 0) {
+					// loop through results and add to list 
+					foreach (DataRow dr in ds.Tables[0].Rows) {
+						// create new MainBanner object
+						User user = new User();
+
+						user.UID = (Int16)dr["intUserID"];
+						user.FirstName = (string)dr["strFirstName"];
+						user.LastName = (string)dr["strLastName"];
+						user.strUsername = (string)dr["strUsername"];
+						user.Email = (string)dr["strEmail"];
+						if (!DBNull.Value.Equals(dr["strPhone"])) {
+							user.Phone = (string)dr["strPhone"];
+						}
+
+						// add MainBanner object (mb) to MainBanner list (banners)
+						subscriberList.Add(user);
+					}
+				}
+				return subscriberList;
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
 		public String GetUsernameRecovery(String email) {
@@ -201,7 +238,7 @@ namespace GCRBA.Models
 				if (ds.Tables[0].Rows.Count != 0) {
 					foreach (DataRow dr in ds.Tables[0].Rows) {
 						companyName = (string)dr["strCompanyName"];
-	
+
 					}
 				}
 				return companyName;
@@ -297,10 +334,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public string GetState(int intStateID)
-		{
-			try
-			{
+		public string GetState(int intStateID) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -322,8 +357,7 @@ namespace GCRBA.Models
 				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					DataRow dr = ds.Tables[0].Rows[0];
 					strState = (string)dr["strState"];
 				}
@@ -332,10 +366,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Company GetCompanyByMember(ProfileViewModel vm)
-		{
-			try
-			{
+		public Company GetCompanyByMember(ProfileViewModel vm) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -352,8 +384,7 @@ namespace GCRBA.Models
 
 				try { da.Fill(ds); } catch (Exception ex) { throw new Exception(ex.Message); } finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					DataRow dr = ds.Tables[0].Rows[0];
 					vm.Company.CompanyID = Convert.ToInt16(dr["intCompanyID"]);
 					vm.Company.Name = (string)dr["strCompanyName"];
@@ -361,13 +392,12 @@ namespace GCRBA.Models
 					vm.Company.Year = (string)dr["strBizYear"];
 				}
 				return vm.Company;
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public NewLocation.ActionTypes DeleteLocation(long lngLocationID, long lngCompanyID)
-		{
-			try
-			{
+		public NewLocation.ActionTypes DeleteLocation(long lngLocationID, long lngCompanyID) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETE_LOCATION", cn);
@@ -388,10 +418,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Location.ActionTypes MemberDeleteLocation(Location l)
-		{
-			try
-			{
+		public Location.ActionTypes MemberDeleteLocation(Location l) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETELOCATION", cn);
@@ -407,7 +435,8 @@ namespace GCRBA.Models
 
 				if (intReturnValue == 1) return Location.ActionTypes.DeleteSuccessful;
 				return Location.ActionTypes.Unknown;
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
 		public NewLocation.ActionTypes DeleteTempLocation(long lngLocationID, long lngCompanyID) {
@@ -419,7 +448,7 @@ namespace GCRBA.Models
 
 				SetParameter(ref cm, "@lngLocationID", lngLocationID, SqlDbType.BigInt);
 				SetParameter(ref cm, "@lngCompanyID", lngCompanyID, SqlDbType.BigInt);
-				
+
 				SetParameter(ref cm, "ReturnValue", 0, SqlDbType.Int, Direction: ParameterDirection.ReturnValue);
 
 				cm.ExecuteReader();
@@ -483,10 +512,8 @@ namespace GCRBA.Models
 		}
 
 		// this user object will be retrieved from where the user types in their data
-		public User.ActionTypes InsertUser(User u)
-		{
-			try
-			{
+		public User.ActionTypes InsertUser(User u) {
+			try {
 				//create a connection object
 				SqlConnection cn = null;
 
@@ -507,8 +534,7 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				switch (intReturnValue)
-				{
+				switch (intReturnValue) {
 					case 1: // new user created
 						u.UID = (int)(long)cm.Parameters["@uid"].Value;
 						return User.ActionTypes.InsertSuccessful;
@@ -524,15 +550,12 @@ namespace GCRBA.Models
 		}
 
 		// open database connection
-		private bool GetDBConnection(ref SqlConnection SQLConn)
-		{
-			try
-			{
+		private bool GetDBConnection(ref SqlConnection SQLConn) {
+			try {
 				if (SQLConn == null) SQLConn = new SqlConnection();
 
 				// check connection state
-				if (SQLConn.State != ConnectionState.Open)
-				{
+				if (SQLConn.State != ConnectionState.Open) {
 					// no open connection, get connection string and try to open connection  
 					SQLConn.ConnectionString = ConfigurationManager.AppSettings["AppDBConnect"];
 					SQLConn.Open();
@@ -544,13 +567,10 @@ namespace GCRBA.Models
 		}
 
 		// close database connection 
-		private bool CloseDBConnection(ref SqlConnection SQLConn)
-		{
-			try
-			{
+		private bool CloseDBConnection(ref SqlConnection SQLConn) {
+			try {
 				// is connection closed?
-				if (SQLConn.State != ConnectionState.Closed)
-				{
+				if (SQLConn.State != ConnectionState.Closed) {
 					// no, so close it 
 					SQLConn.Close();
 					SQLConn.Dispose();
@@ -562,10 +582,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public User.ActionTypes AddNewUser(User u)
-		{
-			try
-			{
+		public User.ActionTypes AddNewUser(User u) {
+			try {
 				// initialize return value 
 				int intReturnValue = -1;
 
@@ -588,8 +606,8 @@ namespace GCRBA.Models
 				SetParameter(ref cm, "@strZip", u.Zip, SqlDbType.NVarChar);
 				SetParameter(ref cm, "@strPhone", u.Phone, SqlDbType.NVarChar);
 				SetParameter(ref cm, "@strEmail", u.Email, SqlDbType.NVarChar);
-				
-				SetParameter(ref cm, "@strUsername", u.encryptedUsername, SqlDbType.NVarChar);
+
+				SetParameter(ref cm, "@strUsername", u.strUsername, SqlDbType.NVarChar);
 				SetParameter(ref cm, "@strPassword", u.Password, SqlDbType.VarBinary);
 				SetParameter(ref cm, "@strSalt", u.salt, SqlDbType.VarBinary);
 				SetParameter(ref cm, "@isAdmin", u.isAdmin, SqlDbType.Bit);
@@ -600,8 +618,7 @@ namespace GCRBA.Models
 				CloseDBConnection(ref cn);
 
 				// return user action type based on return value 
-				switch (intReturnValue)
-				{
+				switch (intReturnValue) {
 					case 1:
 						u.UID = Convert.ToInt16(cm.Parameters["@intNewUserID"].Value);
 						return User.ActionTypes.InsertSuccessful;
@@ -617,10 +634,8 @@ namespace GCRBA.Models
 		}
 
 		// log in user
-		public User Login(User user)
-		{
-			try
-			{
+		public User Login(User user) {
+			try {
 				// create instance of SqlConnection object 
 				SqlConnection cn = new SqlConnection();
 
@@ -638,15 +653,13 @@ namespace GCRBA.Models
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
 				// set parameters
-				SetParameter(ref da, "@strUsername", user.encryptedUsername, SqlDbType.NVarChar);
+				SetParameter(ref da, "@strUsername", user.strUsername, SqlDbType.NVarChar);
 				//SetParameter(ref da, "@strPassword", user.Password, SqlDbType.NVarChar);
 
-				try
-				{
+				try {
 					ds = new DataSet();
 					da.Fill(ds);
-					if (ds.Tables[0].Rows.Count > 0)
-					{
+					if (ds.Tables[0].Rows.Count > 0) {
 						newUser = new User();
 						DataRow dr = ds.Tables[0].Rows[0];
 						newUser.UID = Convert.ToInt16(dr["intUserID"]);
@@ -658,28 +671,25 @@ namespace GCRBA.Models
 						newUser.Zip = (string)dr["strZip"];
 						newUser.Phone = (string)dr["strPhone"];
 						newUser.Email = (string)dr["strEmail"];
-						newUser.encryptedUsername = user.encryptedUsername;
+						//newUser.encryptedUsername = user.encryptedUsername;
 						newUser.Password = user.Password;
 						newUser.isAdmin = Convert.ToInt16(dr["isAdmin"]);
 					}
 				}
 				catch (Exception ex) { throw new Exception(ex.Message); }
-				finally
-				{
+				finally {
 					CloseDBConnection(ref cn);
 				}
-				
-					return newUser;
-				
+
+				return newUser;
+
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
 
 		}
 
-		public User NonAdminLogin(User user)
-		{
-			try
-			{
+		public User NonAdminLogin(User user) {
+			try {
 				// create instance of SqlConnection object 
 				SqlConnection cn = new SqlConnection();
 
@@ -697,16 +707,13 @@ namespace GCRBA.Models
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
 				// set parameters
-				SetParameter(ref da, "@strUsername", user.encryptedUsername, SqlDbType.NVarChar);
+				SetParameter(ref da, "@strUsername", user.strUsername, SqlDbType.NVarChar);
 
-				if (IsUserAdmin(user) == false)
-				{
-					try
-					{
+				if (IsUserAdmin(user) == false) {
+					try {
 						ds = new DataSet();
 						da.Fill(ds);
-						if (ds.Tables[0].Rows.Count > 0)
-						{
+						if (ds.Tables[0].Rows.Count > 0) {
 							newUser = new User();
 							DataRow dr = ds.Tables[0].Rows[0];
 							newUser.UID = Convert.ToInt16(dr["intUserID"]);
@@ -718,29 +725,24 @@ namespace GCRBA.Models
 							// so must check if null here before adding to User object 
 							// if not null, add to User, else skip these columns 
 
-							if (!DBNull.Value.Equals(dr["strAddress"]))
-							{
+							if (!DBNull.Value.Equals(dr["strAddress"])) {
 								newUser.Address = (string)dr["strAddress"];
 							}
 
-							if (!DBNull.Value.Equals(dr["strCity"]))
-							{
+							if (!DBNull.Value.Equals(dr["strCity"])) {
 								newUser.City = (string)dr["strCity"];
 							}
 
-							if (!DBNull.Value.Equals(dr["strState"]))
-							{
+							if (!DBNull.Value.Equals(dr["strState"])) {
 								newUser.intState = Convert.ToInt16(dr["intStateID"]);
 								newUser.State = (string)dr["strState"];
 							}
 
-							if (!DBNull.Value.Equals(dr["strZip"]))
-							{
+							if (!DBNull.Value.Equals(dr["strZip"])) {
 								newUser.Zip = (string)dr["strZip"];
 							}
 
-							if (!DBNull.Value.Equals(dr["strPhone"]))
-							{
+							if (!DBNull.Value.Equals(dr["strPhone"])) {
 								newUser.Phone = (string)dr["strPhone"];
 							}
 
@@ -752,7 +754,7 @@ namespace GCRBA.Models
 								newUser.Password = (byte[])dr["strPassword"];
 							}
 
-							newUser.encryptedUsername = user.encryptedUsername;
+							//newUser.encryptedUsername = user.encryptedUsername;
 							newUser.strUsername = user.strUsername;
 							newUser.isAdmin = Convert.ToInt16(dr["isAdmin"]);
 						}
@@ -761,18 +763,15 @@ namespace GCRBA.Models
 					finally { CloseDBConnection(ref cn); }
 					return newUser;
 				}
-				else
-				{
+				else {
 					return newUser;
 				}
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public User AdminLogin(User user)
-		{
-			try
-			{
+		public User AdminLogin(User user) {
+			try {
 				// create instance of SqlConnection object 
 				SqlConnection cn = new SqlConnection();
 
@@ -790,17 +789,14 @@ namespace GCRBA.Models
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
 				// set parameters
-				SetParameter(ref da, "@strUsername", user.encryptedUsername, SqlDbType.NVarChar);
+				SetParameter(ref da, "@strUsername", user.strUsername, SqlDbType.NVarChar);
 				//SetParameter(ref da, "@strPassword", user.Password, SqlDbType.NVarChar);
 
-				if (IsUserAdmin(user) == true)
-				{
-					try
-					{
+				if (IsUserAdmin(user) == true) {
+					try {
 						ds = new DataSet();
 						da.Fill(ds);
-						if (ds.Tables[0].Rows.Count > 0)
-						{
+						if (ds.Tables[0].Rows.Count > 0) {
 							newUser = new User();
 							DataRow dr = ds.Tables[0].Rows[0];
 							newUser.UID = Convert.ToInt16(dr["intUserID"]);
@@ -816,25 +812,22 @@ namespace GCRBA.Models
 							newUser.Password = (byte[])dr["strPassword"];
 							newUser.isAdmin = Convert.ToInt16(dr["isAdmin"]);
 							newUser.strUsername = user.strUsername;
-							newUser.encryptedUsername = user.encryptedUsername;
+							//newUser.encryptedUsername = user.encryptedUsername;
 						}
 					}
 					catch (Exception ex) { throw new Exception(ex.Message); }
 					finally { CloseDBConnection(ref cn); }
 					return newUser;
 				}
-				else
-				{
+				else {
 					return newUser;
 				}
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
-		
-		public bool IsUserAdmin(User user)
-		{
-			try
-			{
+
+		public bool IsUserAdmin(User user) {
+			try {
 				// create instance of SqlConnection object 
 				SqlConnection cn = new SqlConnection();
 
@@ -852,26 +845,22 @@ namespace GCRBA.Models
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
 				// set parameters
-				SetParameter(ref da, "@strUsername", user.encryptedUsername, SqlDbType.NVarChar);
+				SetParameter(ref da, "@strUsername", user.strUsername, SqlDbType.NVarChar);
 				//SetParameter(ref da, "@strPassword", user.Password, SqlDbType.NVarChar);
 
-				try
-				{
+				try {
 					ds = new DataSet();
 					da.Fill(ds);
-					if (ds.Tables[0].Rows.Count > 0)
-					{
+					if (ds.Tables[0].Rows.Count > 0) {
 						newUser = new User();
 						DataRow dr = ds.Tables[0].Rows[0];
 						newUser.isAdmin = Convert.ToInt16(dr["isAdmin"]);
 					}
 
-					if (newUser == null || newUser.isAdmin == 0)
-					{
+					if (newUser == null || newUser.isAdmin == 0) {
 						return false;
 					}
-					else
-					{
+					else {
 						return true;
 					}
 				}
@@ -881,10 +870,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public void IsUserMember(User u)
-		{
-			try
-			{
+		public void IsUserMember(User u) {
+			try {
 				// create instance of SqlConnection object 
 				SqlConnection cn = new SqlConnection();
 
@@ -903,29 +890,23 @@ namespace GCRBA.Models
 				// set parameters
 				SetParameter(ref da, "@intUserID", u.UID, SqlDbType.Int);
 
-				if (u.UID == 0)
-				{
+				if (u.UID == 0) {
 					u.isMember = 0;
 				}
-				else
-				{
-					try
-					{
+				else {
+					try {
 						ds = new DataSet();
 						da.Fill(ds);
-						if (ds.Tables[0].Rows.Count > 0)
-						{
+						if (ds.Tables[0].Rows.Count > 0) {
 							u.isMember = 1;
 						}
-						else
-						{
+						else {
 							u.isMember = 0;
 						}
-						
+
 					}
 					catch (Exception ex) { throw new Exception(ex.Message); }
-					finally
-					{
+					finally {
 						CloseDBConnection(ref cn);
 					}
 				}
@@ -967,10 +948,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Company GetCompanyInfo(AdminVM vm)
-		{
-			try
-			{
+		public Company GetCompanyInfo(AdminVM vm) {
+			try {
 				// create new instance of SqlConnection object 
 				SqlConnection cn = new SqlConnection();
 
@@ -988,12 +967,10 @@ namespace GCRBA.Models
 
 				SetParameter(ref da, "@intCompanyID", vm.Company.CompanyID, SqlDbType.BigInt);
 
-				try
-				{
+				try {
 					ds = new DataSet();
 					da.Fill(ds);
-					if (ds.Tables[0].Rows.Count > 0)
-					{
+					if (ds.Tables[0].Rows.Count > 0) {
 						DataRow dr = ds.Tables[0].Rows[0];
 						vm.Company.Name = (string)dr["strCompanyName"];
 						vm.Company.About = (string)dr["strAbout"];
@@ -1008,10 +985,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public int GetTotalRequests()
-		{
-			try
-			{
+		public int GetTotalRequests() {
+			try {
 				// create new SqlConnection object
 				SqlConnection cn = new SqlConnection();
 
@@ -1030,12 +1005,10 @@ namespace GCRBA.Models
 				// create variable to hold total requests 
 				int total = 0;
 
-				try
-				{
+				try {
 					ds = new DataSet();
 					da.Fill(ds);
-					if (ds.Tables[0].Rows.Count > 0)
-					{
+					if (ds.Tables[0].Rows.Count > 0) {
 						DataRow dr = ds.Tables[0].Rows[0];
 						total = Convert.ToInt16(dr["TotalRequests"]);
 					}
@@ -1045,14 +1018,12 @@ namespace GCRBA.Models
 				finally { CloseDBConnection(ref cn); }
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
-		} 
+		}
 
-		public string GetMainBanner()
-		{
+		public string GetMainBanner() {
 			string banner = String.Empty;
 
-			try
-			{
+			try {
 				// declare variable to hold banner string 
 				// create new instance of SqlConnection object 
 				SqlConnection cn = new SqlConnection();
@@ -1069,20 +1040,17 @@ namespace GCRBA.Models
 				// specify command type as stored procedure 
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-				try
-				{
+				try {
 					ds = new DataSet();
 					da.Fill(ds);
-					if (ds.Tables[0].Rows.Count > 0)
-					{
+					if (ds.Tables[0].Rows.Count > 0) {
 						DataRow dr = ds.Tables[0].Rows[0];
 						banner = (string)dr["strBanner"];
 						return banner;
 					}
 				}
 				catch (Exception ex) { throw new Exception(ex.Message); }
-				finally
-				{
+				finally {
 					CloseDBConnection(ref cn);
 				}
 			}
@@ -1178,10 +1146,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<MainBanner> GetMainBanners()
-		{
-			try
-			{
+		public List<MainBanner> GetMainBanners() {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1201,11 +1167,9 @@ namespace GCRBA.Models
 				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new MainBanner object
 						MainBanner mb = new MainBanner();
 
@@ -1222,10 +1186,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<Location> GetLocations(Company c)
-		{
-			try
-			{
+		public List<Location> GetLocations(Company c) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1247,11 +1209,9 @@ namespace GCRBA.Models
 				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create location object 
 						Location l = new Location();
 
@@ -1274,10 +1234,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Location GetLocation(Location l)
-		{
-			try
-			{
+		public Location GetLocation(Location l) {
+			try {
 				// create new instance of SqlConnection object 
 				SqlConnection cn = new SqlConnection();
 
@@ -1295,12 +1253,10 @@ namespace GCRBA.Models
 
 				SetParameter(ref da, "@intLocationID", l.LocationID, SqlDbType.BigInt);
 
-				try
-				{
+				try {
 					ds = new DataSet();
 					da.Fill(ds);
-					if (ds.Tables[0].Rows.Count > 0)
-					{
+					if (ds.Tables[0].Rows.Count > 0) {
 						DataRow dr = ds.Tables[0].Rows[0];
 						l.Address = (string)dr["strAddress"];
 						l.City = (string)dr["strCity"];
@@ -1310,30 +1266,27 @@ namespace GCRBA.Models
 						l.Email = (string)dr["strEmail"];
 					}
 					return l;
-				} 
-				catch (Exception ex) { throw new Exception(ex.Message); } 
+				}
+				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<CategoryItem> GetNotCategories(List<CategoryItem> categories, Location l)
-        {
+		public List<CategoryItem> GetNotCategories(List<CategoryItem> categories, Location l) {
 			categories = GetCategories(l, "GET_NOT_CATEGORIES");
 
 			return categories;
-        }
+		}
 
-		public List<CategoryItem> GetCurrentCategories(List<CategoryItem> categories, Location l)
-        {
+		public List<CategoryItem> GetCurrentCategories(List<CategoryItem> categories, Location l) {
 			categories = GetCategories(l, "GET_CURRENT_CATEGORIES");
 
 			return categories;
 		}
 
-		public List<CategoryItem> GetCategories(Location l, string sproc)
-        {
-			try
-			{
+		public List<CategoryItem> GetCategories(Location l, string sproc) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1355,11 +1308,9 @@ namespace GCRBA.Models
 				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create category object
 						CategoryItem c = new CategoryItem();
 
@@ -1376,10 +1327,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<ContactPerson> GetContactsByCompany(AdminVM vm)
-        {
-			try
-            {
+		public List<ContactPerson> GetContactsByCompany(AdminVM vm) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1401,11 +1350,9 @@ namespace GCRBA.Models
 				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-                {
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-                    {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create ContactPerson object
 						ContactPerson c = new ContactPerson();
 
@@ -1415,35 +1362,30 @@ namespace GCRBA.Models
 						c.intContactTypeID = Convert.ToInt16(dr["intContactPersonTypeID"]);
 						c.strContactPersonType = (string)dr["strContactPersonType"];
 
-						if (dr["strContactPhone"].ToString() != SqlString.Null)
-                        {
+						if (dr["strContactPhone"].ToString() != SqlString.Null) {
 							c.strFullPhone = (string)dr["strContactPhone"];
-                        }
+						}
 
-						if (dr["strContactEmail"].ToString() != SqlString.Null)
-						{
+						if (dr["strContactEmail"].ToString() != SqlString.Null) {
 							c.strContactEmail = (string)dr["strContactEmail"];
 						}
 
-						if (dr["intLocationID"].ToString() != SqlString.Null)
-                        {
+						if (dr["intLocationID"].ToString() != SqlString.Null) {
 							c.intLocationID = Convert.ToInt16(dr["intLocationID"]);
-                        }
+						}
 
 						// add contactperson object to list of contacts
 						contacts.Add(c);
 					}
-                }
+				}
 				return contacts;
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
 
 		}
 
-		public List<Location> GetLocationsNotContact(AdminVM vm)
-        {
-			try
-            {
+		public List<Location> GetLocationsNotContact(AdminVM vm) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1466,10 +1408,8 @@ namespace GCRBA.Models
 				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-                {
-					foreach (DataRow dr in ds.Tables[0].Rows)
-                    {
+				if (ds.Tables[0].Rows.Count != 0) {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create location object
 						Location l = new Location();
 
@@ -1482,12 +1422,12 @@ namespace GCRBA.Models
 
 						// add to list of locations 
 						locations.Add(l);
-                    }
-                }
+					}
+				}
 				return locations;
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
-        }
+		}
 
 		public List<NewLocation> GetMemberLocations(Models.User user) {
 			List<NewLocation> lstMemLocations = new List<NewLocation>();
@@ -1496,7 +1436,7 @@ namespace GCRBA.Models
 				SqlConnection cn = new SqlConnection();
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlDataAdapter da = new SqlDataAdapter("SELECT_USERLOCATION_ASSOCIATION", cn);
-				
+
 
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
@@ -1529,10 +1469,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<Company> GetCompanies()
-		{
-			try
-			{
+		public List<Company> GetCompanies() {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1552,11 +1490,9 @@ namespace GCRBA.Models
 				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new Company object
 						Company c = new Company();
 
@@ -1574,10 +1510,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<Website> GetWebsiteTypes()
-		{
-			try
-			{
+		public List<Website> GetWebsiteTypes() {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1593,14 +1527,13 @@ namespace GCRBA.Models
 				// set command type as stored procedure
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-				try { da.Fill(ds); } catch (Exception ex) { throw new Exception(ex.Message); } 
+				try { da.Fill(ds); }
+				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new Company object
 						Website w = new Website();
 
@@ -1614,13 +1547,12 @@ namespace GCRBA.Models
 				}
 				// return list of companies 
 				return types;
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<SocialMedia> GetSocialMediaTypes()
-		{
-			try
-			{
+		public List<SocialMedia> GetSocialMediaTypes() {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1636,14 +1568,13 @@ namespace GCRBA.Models
 				// set command type as stored procedure
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-				try { da.Fill(ds); } catch (Exception ex) { throw new Exception(ex.Message); } 
+				try { da.Fill(ds); }
+				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new Company object
 						SocialMedia s = new SocialMedia();
 
@@ -1657,13 +1588,12 @@ namespace GCRBA.Models
 				}
 				// return list of companies 
 				return types;
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<MemberRequest> GetMembershipRequests()
-		{
-			try
-			{
+		public List<MemberRequest> GetMembershipRequests() {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1679,14 +1609,13 @@ namespace GCRBA.Models
 				// set command type as stored procedure
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-				try { da.Fill(ds); } catch (Exception ex) { throw new Exception(ex.Message); } 
+				try { da.Fill(ds); }
+				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new MemberRequest object
 						MemberRequest request = new MemberRequest();
 
@@ -1701,13 +1630,12 @@ namespace GCRBA.Models
 				}
 				return requests;
 
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public MemberRequest GetMemberInfo(AdminVM vm)
-		{
-			try
-			{
+		public MemberRequest GetMemberInfo(AdminVM vm) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1725,31 +1653,27 @@ namespace GCRBA.Models
 				// set command type as stored procedure 
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-				try { da.Fill(ds); } catch (Exception ex) { throw new Exception(ex.Message); } 
+				try { da.Fill(ds); }
+				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					DataRow dr = ds.Tables[0].Rows[0];
 					m.UserID = Convert.ToInt16(dr["intUserID"]);
 					m.FirstName = (string)dr["strFirstName"];
 					m.LastName = (string)dr["strLastName"];
 
-					if (dr["strEmail"].ToString() == SqlString.Null)
-					{
+					if (dr["strEmail"].ToString() == SqlString.Null) {
 						m.Email = "";
 					}
-					else
-					{
+					else {
 						m.Email = (string)dr["strEmail"];
 					}
 
-					if (dr["strPhone"].ToString() == SqlString.Null)
-					{
+					if (dr["strPhone"].ToString() == SqlString.Null) {
 						m.Phone = "";
 					}
-					else
-					{
+					else {
 						m.Phone = (string)dr["strPhone"];
 					}
 
@@ -1760,13 +1684,12 @@ namespace GCRBA.Models
 
 				}
 				return m;
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<Notification> GetUserNotifications(User u)
-		{
-			try
-			{
+		public List<Notification> GetUserNotifications(User u) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1784,14 +1707,13 @@ namespace GCRBA.Models
 				// set command type as stored procedure
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-				try { da.Fill(ds); } catch (Exception ex) { throw new Exception(ex.Message); } 
+				try { da.Fill(ds); }
+				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new Notification object 
 						Notification message = new Notification();
 
@@ -1810,10 +1732,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<AdminNotification> GetAdminNotifications()
-		{
-			try
-			{
+		public List<AdminNotification> GetAdminNotifications() {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -1829,15 +1749,13 @@ namespace GCRBA.Models
 				// set command type as stored procedure
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-				try { da.Fill(ds); } 
-				catch (Exception ex) { throw new Exception(ex.Message); } 
+				try { da.Fill(ds); }
+				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
+				if (ds.Tables[0].Rows.Count != 0) {
 					// loop through results and add to list 
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new Notification object 
 						AdminNotification message = new AdminNotification();
 
@@ -1861,7 +1779,8 @@ namespace GCRBA.Models
 					}
 				}
 				return messages;
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
 		public bool CheckMemberStatus(long lngLocationID = 0) {
@@ -1898,13 +1817,11 @@ namespace GCRBA.Models
 				else return false;
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
-		
+
 		}
 
-		public User.ActionTypes DeleteNotification(User u)
-		{
-			try
-			{
+		public User.ActionTypes DeleteNotification(User u) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETE_USER_NOTIFICATIONS", cn);
@@ -1918,22 +1835,18 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					return User.ActionTypes.DeleteSuccessful;
-				} 
-				else
-				{
+				}
+				else {
 					return User.ActionTypes.Unknown;
 				}
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public User.ActionTypes DeleteAdminNotifications(User u)
-		{
-			try
-			{
+		public User.ActionTypes DeleteAdminNotifications(User u) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETE_ADMIN_NOTIFICATIONS", cn);
@@ -1947,20 +1860,18 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					return User.ActionTypes.DeleteSuccessful;
-				} else
-				{
+				}
+				else {
 					return User.ActionTypes.Unknown;
 				}
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Company.ActionTypes DeleteCompany(AdminVM vm)
-		{
-			try
-			{
+		public Company.ActionTypes DeleteCompany(AdminVM vm) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETE_COMPANY", cn);
@@ -1974,8 +1885,7 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				switch (intReturnValue)
-				{
+				switch (intReturnValue) {
 					case 1:
 						return Company.ActionTypes.DeleteSuccessful;
 					default:
@@ -2012,10 +1922,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Website.ActionTypes DeleteWebsite(Website w)
-		{
-			try
-			{
+		public Website.ActionTypes DeleteWebsite(Website w) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETE_WEBSITE", cn);
@@ -2029,21 +1937,19 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				switch (intReturnValue)
-				{
+				switch (intReturnValue) {
 					case 1:
 						return Website.ActionTypes.DeleteSuccessful;
 					default:
 						return Website.ActionTypes.Unknown;
 
 				}
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public MemberRequest.ActionTypes DeleteMemberRequest(MemberRequest m)
-		{
-			try
-			{
+		public MemberRequest.ActionTypes DeleteMemberRequest(MemberRequest m) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETE_MEMBER_REQUEST", cn);
@@ -2057,15 +1963,15 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				switch (intReturnValue)
-				{
+				switch (intReturnValue) {
 					case 1:
 						return MemberRequest.ActionTypes.DeleteSuccessful;
 					default:
 						return MemberRequest.ActionTypes.Unknown;
 
 				}
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
 		public List<Image> GetLocationImages(long intLocationID = 0, long intLocationImageID = 0) {
@@ -2123,10 +2029,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public SaleSpecial.ActionTypes DeleteSpecialLocation(SaleSpecial s, Location l)
-		{
-			try
-			{
+		public SaleSpecial.ActionTypes DeleteSpecialLocation(SaleSpecial s, Location l) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETE_SPECIALLOCATION", cn);
@@ -2141,21 +2045,18 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					return SaleSpecial.ActionTypes.DeleteSuccessful;
 				}
-				else
-				{
+				else {
 					return SaleSpecial.ActionTypes.Unknown;
 				}
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public CategoryItem.ActionTypes DeleteCategories(Location l, CategoryItem c)
-        {
-			try
-            {
+		public CategoryItem.ActionTypes DeleteCategories(Location l, CategoryItem c) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("DELETE_CATEGORY_FROM_LOCATION", cn);
@@ -2170,8 +2071,7 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				switch (intReturnValue)
-				{
+				switch (intReturnValue) {
 					case 1:
 						return CategoryItem.ActionTypes.DeleteSuccessful;
 					default:
@@ -2180,14 +2080,12 @@ namespace GCRBA.Models
 				}
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
-        }
+		}
 
-		public bool InsertHomepageBanner()
-		{
+		public bool InsertHomepageBanner() {
 			MainBanner mb = new MainBanner();
 
-			try
-			{
+			try {
 				SqlConnection cn = null; // inside System.Data.SqlClient
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_NEW_MAIN_BANNER", cn);
@@ -2202,13 +2100,11 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					mb.BannerID = (int)cm.Parameters["@intMainBannerID"].Value;
 					return true;
 				}
-				else
-				{
+				else {
 					return false;
 				}
 			}
@@ -2219,10 +2115,8 @@ namespace GCRBA.Models
 		private int SetParameter(ref SqlCommand cm, string ParameterName, Object Value
 			, SqlDbType ParameterType, int FieldSize = -1
 			, ParameterDirection Direction = ParameterDirection.Input
-			, Byte Precision = 0, Byte Scale = 0)
-		{
-			try
-			{
+			, Byte Precision = 0, Byte Scale = 0) {
+			try {
 				cm.CommandType = CommandType.StoredProcedure;
 				if (FieldSize == -1)
 					cm.Parameters.Add(ParameterName, ParameterType);
@@ -2243,10 +2137,8 @@ namespace GCRBA.Models
 		private int SetParameter(ref SqlDataAdapter cm, string ParameterName, Object Value
 			, SqlDbType ParameterType, int FieldSize = -1
 			, ParameterDirection Direction = ParameterDirection.Input
-			, Byte Precision = 0, Byte Scale = 0)
-		{
-			try
-			{
+			, Byte Precision = 0, Byte Scale = 0) {
+			try {
 				cm.SelectCommand.CommandType = CommandType.StoredProcedure;
 				if (FieldSize == -1)
 					cm.SelectCommand.Parameters.Add(ParameterName, ParameterType);
@@ -2264,10 +2156,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public User.ActionTypes UpdateUser(ProfileViewModel vm)
-		{
-			try
-			{
+		public User.ActionTypes UpdateUser(ProfileViewModel vm) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("UPDATE_USER", cn);
@@ -2291,8 +2181,7 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				switch (intReturnValue)
-				{
+				switch (intReturnValue) {
 					case 1: //new updated
 						return User.ActionTypes.UpdateSuccessful;
 					default:
@@ -2336,10 +2225,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public MemberRequest.ActionTypes UpdateMemberStatus(MemberRequest m)
-		{
-			try
-			{
+		public MemberRequest.ActionTypes UpdateMemberStatus(MemberRequest m) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("UPDATE_MEMBER_STATUS", cn);
@@ -2353,8 +2240,7 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					m.ActionType = MemberRequest.ActionTypes.InsertSuccessful;
 					return m.ActionType;
 				}
@@ -2365,10 +2251,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Website.ActionTypes UpdateWebsite(Website w)
-		{
-			try
-			{
+		public Website.ActionTypes UpdateWebsite(Website w) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("UPDATE_WEBSITE", cn);
@@ -2382,22 +2266,19 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					return Website.ActionTypes.UpdateSuccessful;
 				}
-				else
-				{
+				else {
 					return Website.ActionTypes.Unknown;
 				}
 
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public SocialMedia.ActionTypes UpdateSocialMedia(SocialMedia s)
-		{
-			try
-			{
+		public SocialMedia.ActionTypes UpdateSocialMedia(SocialMedia s) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("UPDATE_SOCIALMEDIA", cn);
@@ -2411,21 +2292,19 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					return SocialMedia.ActionTypes.UpdateSuccessful;
-				} else
-				{
+				}
+				else {
 					return SocialMedia.ActionTypes.Unknown;
 				}
 
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Website.ActionTypes InsertNewWebsite(Website w, Company c)
-		{
-			try
-			{
+		public Website.ActionTypes InsertNewWebsite(Website w, Company c) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_NEW_WEBSITE", cn);
@@ -2440,11 +2319,10 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					return Website.ActionTypes.UpdateSuccessful;
-				} else
-				{
+				}
+				else {
 					return Website.ActionTypes.Unknown;
 				}
 
@@ -2452,10 +2330,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public SocialMedia.ActionTypes InsertNewSocialMedia(SocialMedia s, Company c)
-		{
-			try
-			{
+		public SocialMedia.ActionTypes InsertNewSocialMedia(SocialMedia s, Company c) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_NEW_SOCIALMEDIA", cn);
@@ -2470,21 +2346,19 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					return SocialMedia.ActionTypes.UpdateSuccessful;
-				} else
-				{
+				}
+				else {
 					return SocialMedia.ActionTypes.Unknown;
 				}
 
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public void UpdateCompanyInfo(Company c)
-		{
-			try
-			{
+		public void UpdateCompanyInfo(Company c) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("UPDATE_COMPANY_INFO", cn);
@@ -2501,10 +2375,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Location.ActionTypes UpdateLocationInfo(Location l)
-		{
-			try
-			{
+		public Location.ActionTypes UpdateLocationInfo(Location l) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("UPDATE_LOCATION", cn);
@@ -2523,22 +2395,19 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					return Location.ActionTypes.UpdateSuccessful;
 				}
-				else
-				{
+				else {
 					return Location.ActionTypes.Unknown;
 				}
 
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public User.ActionTypes UpdateNotificationStatus(User u)
-		{
-			try
-			{
+		public User.ActionTypes UpdateNotificationStatus(User u) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("MARK_NOTIFICATION_AS_READ", cn);
@@ -2552,12 +2421,10 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					u.ActionType = User.ActionTypes.UpdateSuccessful;
 				}
-				else
-				{
+				else {
 					u.ActionType = User.ActionTypes.Unknown;
 				}
 
@@ -2566,10 +2433,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public User.ActionTypes UpdateAdminNotificationStatus(User u)
-		{
-			try
-			{
+		public User.ActionTypes UpdateAdminNotificationStatus(User u) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("MARK_ADMIN_NOTIFICATION_AS_READ", cn);
@@ -2583,22 +2448,20 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					u.ActionType = User.ActionTypes.UpdateSuccessful;
-				} else
-				{
+				}
+				else {
 					u.ActionType = User.ActionTypes.Unknown;
 				}
 
 				return u.ActionType;
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public Company.ActionTypes InsertNewCompany(AdminVM vm)
-		{
-			try
-			{
+		public Company.ActionTypes InsertNewCompany(AdminVM vm) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_COMPANY", cn);
@@ -2615,8 +2478,7 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				switch (intReturnValue)
-				{
+				switch (intReturnValue) {
 					case -1:
 						return Company.ActionTypes.DuplicateName;
 					case 1: // new user created
@@ -2631,10 +2493,8 @@ namespace GCRBA.Models
 
 		}
 
-		public List<Website> GetCompanyWebsites(Company c)
-		{
-			try
-			{
+		public List<Website> GetCompanyWebsites(Company c) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -2656,10 +2516,8 @@ namespace GCRBA.Models
 				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+				if (ds.Tables[0].Rows.Count != 0) {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new website object for each website
 						Website w = new Website();
 
@@ -2678,10 +2536,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<SocialMedia> GetCompanySocialMedia(Company c)
-		{
-			try
-			{
+		public List<SocialMedia> GetCompanySocialMedia(Company c) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 
@@ -2699,13 +2555,12 @@ namespace GCRBA.Models
 				// set command type as stored procedure
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
-				try { da.Fill(ds); } catch (Exception ex) { throw new Exception(ex.Message); } 
+				try { da.Fill(ds); }
+				catch (Exception ex) { throw new Exception(ex.Message); }
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+				if (ds.Tables[0].Rows.Count != 0) {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						// create new website object for each website
 						SocialMedia s = new SocialMedia();
 
@@ -2720,13 +2575,12 @@ namespace GCRBA.Models
 					}
 				}
 				return links;
-			} catch (Exception ex) { throw new Exception(ex.Message); }
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public void SendUserNotification(MemberRequest m, int intNotificationID, int intNotificationStatusID)
-		{
-			try
-			{
+		public void SendUserNotification(MemberRequest m, int intNotificationID, int intNotificationStatusID) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_USER_NOTIFICATION", cn);
@@ -2743,8 +2597,7 @@ namespace GCRBA.Models
 		}
 
 		public SaleSpecial InsertSpecial(SaleSpecial s) {
-			try 
-			{
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_SPECIAL", cn);
@@ -2771,10 +2624,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public void InsertAdminNotification(User u, int editedColumnID, int editedTableID, string previousVersion, string newVersion)
-		{
-			try
-			{
+		public void InsertAdminNotification(User u, int editedColumnID, int editedTableID, string previousVersion, string newVersion) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_ADMIN_NOTIFICATION_EDIT", cn);
@@ -2792,10 +2643,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public SaleSpecial.ActionTypes InsertSpecialLocation(SaleSpecial s, Location l) 
-		{
-			try 
-			{
+		public SaleSpecial.ActionTypes InsertSpecialLocation(SaleSpecial s, Location l) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_SPECIALLOCATION", cn);
@@ -2819,10 +2668,8 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public CategoryItem.ActionTypes InsertCategories(CategoryItem c, Location l)
-        {
-			try
-            {
+		public CategoryItem.ActionTypes InsertCategories(CategoryItem c, Location l) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_CATEGORYLOCATION", cn);
@@ -2838,26 +2685,21 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-                {
+				if (intReturnValue == 1) {
 					return CategoryItem.ActionTypes.InsertSuccessful;
-                }
-				else
-                {
+				}
+				else {
 					return CategoryItem.ActionTypes.Unknown;
-                }
+				}
 
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
-        }
+		}
 
-		public LocationList.ActionTypes InsertCompany(LocationList locList)
-		{
+		public LocationList.ActionTypes InsertCompany(LocationList locList) {
 			int i = 0;
-			do
-			{
-				try
-				{
+			do {
+				try {
 					SqlConnection cn = null;
 					if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 					SqlCommand cm = new SqlCommand("INSERT_COMPANY", cn);
@@ -2875,7 +2717,7 @@ namespace GCRBA.Models
 
 					cm.ExecuteReader();
 
-					
+
 					CloseDBConnection(ref cn);
 					intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 					if (intReturnValue == -1) return Models.LocationList.ActionTypes.CompanyNameExists;
@@ -2887,13 +2729,10 @@ namespace GCRBA.Models
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		public LocationList.ActionTypes InsertLocation(LocationList locList)
-		{
+		public LocationList.ActionTypes InsertLocation(LocationList locList) {
 			int i = 0;
-			do
-			{
-				try
-				{
+			do {
+				try {
 					//Convert Phone Class to Concat String
 					string PhoneNumber = locList.lstLocations[i].BusinessPhone.AreaCode + locList.lstLocations[i].BusinessPhone.Prefix + locList.lstLocations[i].BusinessPhone.Suffix;
 
@@ -2914,7 +2753,7 @@ namespace GCRBA.Models
 					SetParameter(ref cm, "ReturnValue", 0, SqlDbType.TinyInt, Direction: ParameterDirection.ReturnValue);
 
 					cm.ExecuteReader();
-					
+
 					CloseDBConnection(ref cn);
 					intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 					if (intReturnValue != 1) return LocationList.ActionTypes.LocationExists;
@@ -2928,10 +2767,8 @@ namespace GCRBA.Models
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		public NewLocation.ActionTypes AddNewLocation(AdminVM vm)
-        {
-			try
-            {
+		public NewLocation.ActionTypes AddNewLocation(AdminVM vm) {
+			try {
 				SqlConnection cn = null;
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_LOCATION", cn);
@@ -2952,29 +2789,23 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-                {
+				if (intReturnValue == 1) {
 					return NewLocation.ActionTypes.InsertSuccessful;
-                } else
-                {
+				}
+				else {
 					return NewLocation.ActionTypes.Unknown;
-                }
-            }
+				}
+			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
-        }
+		}
 
-		public LocationList.ActionTypes InsertSpecialties(LocationList locList, List<Models.CategoryItem>[] categories)
-		{
+		public LocationList.ActionTypes InsertSpecialties(LocationList locList, List<Models.CategoryItem>[] categories) {
 			int intReturnValue = 0;
 			int i = 0;
-			do
-			{
-				try
-				{
-					foreach (Models.CategoryItem item in categories[i])
-					{
-						if (item.blnAvailable == true)
-						{
+			do {
+				try {
+					foreach (Models.CategoryItem item in categories[i]) {
+						if (item.blnAvailable == true) {
 							SqlConnection cn = null;
 							if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 							SqlCommand cm = new SqlCommand("INSERT_CATEGORYLOCATION", cn);
@@ -2986,7 +2817,7 @@ namespace GCRBA.Models
 							SetParameter(ref cm, "ReturnValue", 0, SqlDbType.TinyInt, Direction: ParameterDirection.ReturnValue);
 
 							cm.ExecuteReader();
-							
+
 							CloseDBConnection(ref cn);
 							intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 							if (intReturnValue != 1) return Models.LocationList.ActionTypes.CategoryLocationExists;
@@ -3001,11 +2832,10 @@ namespace GCRBA.Models
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		public LocationList.ActionTypes InsertLocationHours(LocationList locList, List<Models.Days>[] LocationHours)
-		{
+		public LocationList.ActionTypes InsertLocationHours(LocationList locList, List<Models.Days>[] LocationHours) {
 			int i = 0;
 			int intReturnValue = -1;
-			try { 
+			try {
 				do {
 					foreach (Models.Days item in LocationHours[i]) {
 
@@ -3036,7 +2866,7 @@ namespace GCRBA.Models
 						SetParameter(ref cm, "ReturnValue", 0, SqlDbType.TinyInt, Direction: ParameterDirection.ReturnValue);
 
 						cm.ExecuteReader();
-						
+
 						CloseDBConnection(ref cn);
 						intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 						if (intReturnValue != 1) return Models.LocationList.ActionTypes.LocationHourExists;
@@ -3061,20 +2891,16 @@ namespace GCRBA.Models
 				*/
 			}
 			catch (Exception ex) { throw new Exception(ex.Message); }
-		return LocationList.ActionTypes.InsertSuccessful;
+			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		public LocationList.ActionTypes InsertSocialMedia(LocationList locList, List<Models.SocialMedia>[] socialMedias)
-		{
+		public LocationList.ActionTypes InsertSocialMedia(LocationList locList, List<Models.SocialMedia>[] socialMedias) {
 			int intReturnValue = 0;
 			int i = 0;
-			do
-			{
-				try
-				{
+			do {
+				try {
 
-					foreach (Models.SocialMedia item in socialMedias[i])
-					{
+					foreach (Models.SocialMedia item in socialMedias[i]) {
 						if (item.blnAvailable == false) continue;
 						SqlConnection cn = null;
 						if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
@@ -3114,15 +2940,11 @@ namespace GCRBA.Models
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		public LocationList.ActionTypes InsertContactPerson(LocationList locList, List<Models.ContactPerson>[] contacts)
-		{
+		public LocationList.ActionTypes InsertContactPerson(LocationList locList, List<Models.ContactPerson>[] contacts) {
 			int i = 0;
-			do
-			{
-				try
-				{
-					foreach (Models.ContactPerson item in contacts[i])
-					{
+			do {
+				try {
+					foreach (Models.ContactPerson item in contacts[i]) {
 						//if (item.strContactFirstName == string.Empty || item.strContactLastName == string.Empty) continue;
 						//if (item.contactPhone.AreaCode == string.Empty || item.contactPhone.Prefix == string.Empty) continue;
 
@@ -3143,7 +2965,7 @@ namespace GCRBA.Models
 						SetParameter(ref cm, "ReturnValue", 0, SqlDbType.TinyInt, Direction: ParameterDirection.ReturnValue);
 
 						cm.ExecuteReader();
-						
+
 						CloseDBConnection(ref cn);
 						intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 						if (intReturnValue != 1) return Models.LocationList.ActionTypes.ContactPersonExists;
@@ -3167,16 +2989,12 @@ namespace GCRBA.Models
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		public LocationList.ActionTypes InsertWebsite(LocationList locList, List<Models.Website>[] websites)
-		{
+		public LocationList.ActionTypes InsertWebsite(LocationList locList, List<Models.Website>[] websites) {
 			int i = 0;
 			int intReturnValue = 0;
-			do
-			{
-				try
-				{
-					foreach (Models.Website item in websites[i])
-					{
+			do {
+				try {
+					foreach (Models.Website item in websites[i]) {
 						if (item.strURL == string.Empty || item.strURL == null) continue;
 						SqlConnection cn = null;
 						if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
@@ -3190,13 +3008,13 @@ namespace GCRBA.Models
 						SetParameter(ref cm, "ReturnValue", 0, SqlDbType.TinyInt, Direction: ParameterDirection.ReturnValue);
 
 						cm.ExecuteReader();
-						
+
 						CloseDBConnection(ref cn);
 						intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 						if (intReturnValue != 1) return Models.LocationList.ActionTypes.WebpageURLExists;
 						item.intWebsiteID = (long)cm.Parameters["@intWebsiteID"].Value;
-						
-						
+
+
 
 					}
 					i += 1;
@@ -3206,14 +3024,11 @@ namespace GCRBA.Models
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		public List<Models.NewLocation> GetLocations(List<Models.CategoryItem> categoryItems)
-		{
+		public List<Models.NewLocation> GetLocations(List<Models.CategoryItem> categoryItems) {
 
 			List<Models.NewLocation> locs = new List<Models.NewLocation>();
-			foreach (Models.CategoryItem item in categoryItems)
-			{
-				try
-				{
+			foreach (Models.CategoryItem item in categoryItems) {
+				try {
 					DataSet ds = new DataSet();
 					SqlConnection cn = new SqlConnection();
 					if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
@@ -3223,20 +3038,16 @@ namespace GCRBA.Models
 
 					if (item.blnAvailable == true) SetParameter(ref da, "@intCategoryID", item.ItemID, SqlDbType.SmallInt);
 					else continue;
-					try
-					{
+					try {
 						da.Fill(ds);
 					}
-					catch (Exception ex2)
-					{
+					catch (Exception ex2) {
 						throw new Exception(ex2.Message);
 					}
 					finally { CloseDBConnection(ref cn); }
 
-					if (ds.Tables[0].Rows.Count != 0)
-					{
-						foreach (DataRow dr in ds.Tables[0].Rows)
-						{
+					if (ds.Tables[0].Rows.Count != 0) {
+						foreach (DataRow dr in ds.Tables[0].Rows) {
 							NewLocation loc = new NewLocation();
 							loc.lngLocationID = (long)dr["intLocationID"];
 							loc.lngCompanyID = (long)dr["intCompanyID"];
@@ -3255,10 +3066,8 @@ namespace GCRBA.Models
 			return locs;
 		}
 
-		public Models.NewLocation GetLandingLocation(long lngLocationID = 0)
-		{
-			try
-			{
+		public Models.NewLocation GetLandingLocation(long lngLocationID = 0) {
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
@@ -3268,20 +3077,16 @@ namespace GCRBA.Models
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
 				if (lngLocationID > 0) SetParameter(ref da, "@intLocationID", lngLocationID, SqlDbType.BigInt);
-				try
-				{
+				try {
 					da.Fill(ds);
 				}
-				catch (Exception ex2)
-				{
+				catch (Exception ex2) {
 					throw new Exception(ex2.Message);
 				}
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+				if (ds.Tables[0].Rows.Count != 0) {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						loc.lngLocationID = (long)dr["intLocationID"];
 						loc.lngCompanyID = (long)dr["intCompanyID"];
 						loc.LocationName = (string)dr["strCompanyName"];
@@ -3440,7 +3245,7 @@ namespace GCRBA.Models
 							loc.BizYear = (string)dr["strBizYear"];
 						}
 						else { loc.BizYear = ""; }
-						
+
 					}
 				}
 				return loc;
@@ -3448,11 +3253,9 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<Models.CategoryItem> GetLandingCategories(long lngLocationID = 0)
-		{
+		public List<Models.CategoryItem> GetLandingCategories(long lngLocationID = 0) {
 			List<Models.CategoryItem> lstCategories = new List<CategoryItem>();
-			try
-			{
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
@@ -3461,20 +3264,16 @@ namespace GCRBA.Models
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
 				if (lngLocationID > 0) SetParameter(ref da, "@intLocationID", lngLocationID, SqlDbType.BigInt);
-				try
-				{
+				try {
 					da.Fill(ds);
 				}
-				catch (Exception ex2)
-				{
+				catch (Exception ex2) {
 					throw new Exception(ex2.Message);
 				}
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+				if (ds.Tables[0].Rows.Count != 0) {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						Models.CategoryItem item = new CategoryItem();
 						item.ItemID = (short)dr["intCategoryID"];
 						item.ItemDesc = (string)dr["strCategory"];
@@ -3520,11 +3319,9 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<Models.SaleSpecial> GetLandingSpecials(long lngLocationID = 0)
-		{
+		public List<Models.SaleSpecial> GetLandingSpecials(long lngLocationID = 0) {
 			List<Models.SaleSpecial> lstSpecials = new List<SaleSpecial>();
-			try
-			{
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
@@ -3533,20 +3330,16 @@ namespace GCRBA.Models
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
 				if (lngLocationID > 0) SetParameter(ref da, "@intLocationID", lngLocationID, SqlDbType.BigInt);
-				try
-				{
+				try {
 					da.Fill(ds);
 				}
-				catch (Exception ex2)
-				{
+				catch (Exception ex2) {
 					throw new Exception(ex2.Message);
 				}
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+				if (ds.Tables[0].Rows.Count != 0) {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						Models.SaleSpecial item = new SaleSpecial();
 						item.SpecialID = Convert.ToInt16(dr["intSpecialID"]);
 						item.strDescription = (string)dr["strDescription"];
@@ -3561,11 +3354,9 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public List<Models.Awards> GetLandingAwards(long lngLocationID = 0)
-		{
+		public List<Models.Awards> GetLandingAwards(long lngLocationID = 0) {
 			List<Models.Awards> lstAwards = new List<Awards>();
-			try
-			{
+			try {
 				DataSet ds = new DataSet();
 				SqlConnection cn = new SqlConnection();
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
@@ -3574,20 +3365,16 @@ namespace GCRBA.Models
 				da.SelectCommand.CommandType = CommandType.StoredProcedure;
 
 				if (lngLocationID > 0) SetParameter(ref da, "@intLocationID", lngLocationID, SqlDbType.BigInt);
-				try
-				{
+				try {
 					da.Fill(ds);
 				}
-				catch (Exception ex2)
-				{
+				catch (Exception ex2) {
 					throw new Exception(ex2.Message);
 				}
 				finally { CloseDBConnection(ref cn); }
 
-				if (ds.Tables[0].Rows.Count != 0)
-				{
-					foreach (DataRow dr in ds.Tables[0].Rows)
-					{
+				if (ds.Tables[0].Rows.Count != 0) {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
 						Models.Awards item = new Awards();
 						item.strFrom = (string)dr["strFrom"];
 						item.strAward = (string)dr["strAward"];
@@ -3743,11 +3530,9 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-			public bool InsertNewMainBanner(AdminBannerViewModel vm)
-		{
+		public bool InsertNewMainBanner(AdminBannerViewModel vm) {
 
-			try
-			{
+			try {
 				SqlConnection cn = null; // inside System.Data.SqlClient
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_NEW_MAIN_BANNER", cn);
@@ -3762,13 +3547,11 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					vm.MainBanner.BannerID = Convert.ToInt16(cm.Parameters["@intNewBannerID"].Value);
 					return true;
 				}
-				else
-				{
+				else {
 					return false;
 				}
 			}
@@ -3841,11 +3624,9 @@ namespace GCRBA.Models
 			catch (Exception ex) { throw new Exception(ex.Message); }
 		}
 
-		public bool InsertUserToMember(User u)
-		{
+		public bool InsertUserToMember(User u) {
 
-			try
-			{
+			try {
 				SqlConnection cn = null; // inside System.Data.SqlClient
 				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 				SqlCommand cm = new SqlCommand("INSERT_USER_TO_MEMBER", cn);
@@ -3858,8 +3639,7 @@ namespace GCRBA.Models
 				int ipt = 0;
 
 
-				switch (mt)
-				{					
+				switch (mt) {
 					case "Associate":
 						imt = 1;
 						break;
@@ -3877,8 +3657,7 @@ namespace GCRBA.Models
 						break;
 				}
 
-				switch (pt)
-				{
+				switch (pt) {
 					case "Zelle":
 						ipt = 1;
 						break;
@@ -3886,7 +3665,7 @@ namespace GCRBA.Models
 					case "Check":
 						ipt = 2;
 						break;
-					
+
 					default:
 						ipt = 0;
 						break;
@@ -3903,13 +3682,11 @@ namespace GCRBA.Models
 				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 				CloseDBConnection(ref cn);
 
-				if (intReturnValue == 1)
-				{
+				if (intReturnValue == 1) {
 					//vm.MainBanner.BannerID = Convert.ToInt16(cm.Parameters["@intNewBannerID"].Value);
 					return true;
 				}
-				else
-				{
+				else {
 					return false;
 				}
 			}
@@ -3925,11 +3702,11 @@ namespace GCRBA.Models
 					SqlCommand cm = new SqlCommand("INSERT_TEMP_COMPANY", cn);
 					int intReturnValue = -1;
 
-					if(string.IsNullOrEmpty(locList.lstLocations[i].Bio)) {
+					if (string.IsNullOrEmpty(locList.lstLocations[i].Bio)) {
 						locList.lstLocations[i].Bio = string.Empty;
 					}
 
-					if(string.IsNullOrEmpty(locList.lstLocations[i].BizYear)) {
+					if (string.IsNullOrEmpty(locList.lstLocations[i].BizYear)) {
 						locList.lstLocations[i].BizYear = string.Empty;
 					}
 
@@ -3954,7 +3731,7 @@ namespace GCRBA.Models
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		public LocationList.ActionTypes InsertAdminRequest(LocationList locList, List<Models.AdminRequest> adminRequestList ) {
+		public LocationList.ActionTypes InsertAdminRequest(LocationList locList, List<Models.AdminRequest> adminRequestList) {
 			int i = 0;
 			do {
 				try {
@@ -3977,7 +3754,7 @@ namespace GCRBA.Models
 					CloseDBConnection(ref cn);
 					intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
 					if (intReturnValue == -1) return Models.LocationList.ActionTypes.Unknown;
-					i ++;
+					i++;
 					//adminRequest.intAdminRequest = (short)cm.Parameters["@intAdminRequestID"].Value;
 				}
 				catch (Exception ex) { throw new Exception(ex.Message); }
@@ -4006,7 +3783,7 @@ namespace GCRBA.Models
 					SetParameter(ref cm, "@strPhone", PhoneNumber, SqlDbType.NVarChar);
 					SetParameter(ref cm, "@strEmail", locList.lstLocations[i].BusinessEmail, SqlDbType.NVarChar);
 					//SetParameter(ref cm, "@intAdminRequestID", locList.adminReq.intAdminRequest, SqlDbType.SmallInt);
-					
+
 
 					SetParameter(ref cm, "ReturnValue", 0, SqlDbType.TinyInt, Direction: ParameterDirection.ReturnValue);
 
@@ -4069,8 +3846,8 @@ namespace GCRBA.Models
 						if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
 						SqlCommand cm = new SqlCommand("INSERT_TEMP_LOCATIONHOURS", cn);
 
-						
-						
+
+
 						if (!String.IsNullOrEmpty(item.strOpenTime)) {
 							item.dtOpenTime = Convert.ToDateTime(item.strOpenTime);
 							item.strOpenTime = item.dtOpenTime.ToShortTimeString();
@@ -4337,23 +4114,23 @@ namespace GCRBA.Models
 
 		public LocationList.ActionTypes InsertCompanyMember(long intCompanyID, short intMemberID) {
 			int intReturnValue = 0;
-				try {
-						SqlConnection cn = null;
-						if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
-						SqlCommand cm = new SqlCommand("INSERT_COMPANYMEMBER_RELATIONSHIP", cn);
+			try {
+				SqlConnection cn = null;
+				if (!GetDBConnection(ref cn)) throw new Exception("Database did not connect");
+				SqlCommand cm = new SqlCommand("INSERT_COMPANYMEMBER_RELATIONSHIP", cn);
 
-						SetParameter(ref cm, "@intMemberID", intMemberID, SqlDbType.SmallInt);
-						SetParameter(ref cm, "@intCompanyID", intCompanyID, SqlDbType.BigInt);
+				SetParameter(ref cm, "@intMemberID", intMemberID, SqlDbType.SmallInt);
+				SetParameter(ref cm, "@intCompanyID", intCompanyID, SqlDbType.BigInt);
 
-						SetParameter(ref cm, "ReturnValue", 0, SqlDbType.TinyInt, Direction: ParameterDirection.ReturnValue);
+				SetParameter(ref cm, "ReturnValue", 0, SqlDbType.TinyInt, Direction: ParameterDirection.ReturnValue);
 
-						cm.ExecuteReader();
+				cm.ExecuteReader();
 
-						CloseDBConnection(ref cn);
-						intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
-						if (intReturnValue != 1) return Models.LocationList.ActionTypes.Unknown;
-				}
-				catch (Exception ex) { throw new Exception(ex.Message); }
+				CloseDBConnection(ref cn);
+				intReturnValue = (int)cm.Parameters["ReturnValue"].Value;
+				if (intReturnValue != 1) return Models.LocationList.ActionTypes.Unknown;
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
@@ -4385,6 +4162,114 @@ namespace GCRBA.Models
 			return LocationList.ActionTypes.InsertSuccessful;
 		}
 
-		
+
+	}
+
+	public static class StaticDatabase {
+		public static String GetSystemPassword(String id) {
+			String password = String.Empty;
+			try {
+				DataSet ds = new DataSet();
+				SqlConnection cn = new SqlConnection();
+				if (!GetStaticDBConnection(ref cn)) throw new Exception("Database did not connect");
+				SqlDataAdapter da = new SqlDataAdapter("GET_SYSTEM_CREDENTIALS", cn);
+
+				SetStaticParameter(ref da, "@id", id, SqlDbType.NVarChar);
+
+				da.SelectCommand.CommandType = CommandType.StoredProcedure;
+
+				try {
+					da.Fill(ds);
+				}
+				catch (Exception ex2) {
+					throw new Exception(ex2.Message);
+				}
+				finally { CloseStaticDBConnection(ref cn); }
+
+				if (ds.Tables[0].Rows.Count != 0) {
+					foreach (DataRow dr in ds.Tables[0].Rows) {
+						password = (String)dr["password"];
+					}
+				}
+				return password;
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
+		}
+
+		private static bool GetStaticDBConnection(ref SqlConnection SQLConn) {
+			try {
+				if (SQLConn == null) SQLConn = new SqlConnection();
+
+				// check connection state
+				if (SQLConn.State != ConnectionState.Open) {
+					// no open connection, get connection string and try to open connection  
+					SQLConn.ConnectionString = ConfigurationManager.AppSettings["AppDBConnect"];
+					SQLConn.Open();
+				}
+				// connection successful 
+				return true;
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
+		}
+
+		// close database connection 
+		private static bool CloseStaticDBConnection(ref SqlConnection SQLConn) {
+			try {
+				// is connection closed?
+				if (SQLConn.State != ConnectionState.Closed) {
+					// no, so close it 
+					SQLConn.Close();
+					SQLConn.Dispose();
+					SQLConn = null;
+				}
+				// connection closed successfully
+				return true;
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
+		}
+
+		private static int SetStaticParameter(ref SqlCommand cm, string ParameterName, Object Value
+			, SqlDbType ParameterType, int FieldSize = -1
+			, ParameterDirection Direction = ParameterDirection.Input
+			, Byte Precision = 0, Byte Scale = 0) {
+			try {
+				cm.CommandType = CommandType.StoredProcedure;
+				if (FieldSize == -1)
+					cm.Parameters.Add(ParameterName, ParameterType);
+				else
+					cm.Parameters.Add(ParameterName, ParameterType, FieldSize);
+
+				if (Precision > 0) cm.Parameters[cm.Parameters.Count - 1].Precision = Precision;
+				if (Scale > 0) cm.Parameters[cm.Parameters.Count - 1].Scale = Scale;
+
+				cm.Parameters[cm.Parameters.Count - 1].Value = Value;
+				cm.Parameters[cm.Parameters.Count - 1].Direction = Direction;
+
+				return 0;
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
+		}
+
+		private static int SetStaticParameter(ref SqlDataAdapter cm, string ParameterName, Object Value
+			, SqlDbType ParameterType, int FieldSize = -1
+			, ParameterDirection Direction = ParameterDirection.Input
+			, Byte Precision = 0, Byte Scale = 0) {
+			try {
+				cm.SelectCommand.CommandType = CommandType.StoredProcedure;
+				if (FieldSize == -1)
+					cm.SelectCommand.Parameters.Add(ParameterName, ParameterType);
+				else
+					cm.SelectCommand.Parameters.Add(ParameterName, ParameterType, FieldSize);
+
+				if (Precision > 0) cm.SelectCommand.Parameters[cm.SelectCommand.Parameters.Count - 1].Precision = Precision;
+				if (Scale > 0) cm.SelectCommand.Parameters[cm.SelectCommand.Parameters.Count - 1].Scale = Scale;
+
+				cm.SelectCommand.Parameters[cm.SelectCommand.Parameters.Count - 1].Value = Value;
+				cm.SelectCommand.Parameters[cm.SelectCommand.Parameters.Count - 1].Direction = Direction;
+
+				return 0;
+			}
+			catch (Exception ex) { throw new Exception(ex.Message); }
+		}
 	}
 }

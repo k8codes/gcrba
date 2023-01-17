@@ -38,7 +38,7 @@ namespace GCRBA.Models {
 
 		public bool IsImageFile() {
 			try {
-				if (FileExtension.ToLower() == ".jpeg" || FileExtension.ToLower() == ".jpg" || FileExtension.ToLower() == ".bmp" || FileExtension.ToLower() == ".gif" || FileExtension.ToLower() == ".png" || FileExtension.ToLower() == ".jfif") {
+				if (FileExtension.ToLower() == ".jpeg" || FileExtension.ToLower() == ".jpg" || FileExtension.ToLower() == ".bmp" || FileExtension.ToLower() == ".gif" || FileExtension.ToLower() == ".png" || FileExtension.ToLower() == ".jfif" || FileExtension.ToLower() == ".pdf") {
 					return true;
 				}
 				return false;

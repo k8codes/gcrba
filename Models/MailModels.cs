@@ -54,4 +54,14 @@ namespace GCRBA.Models {
 			Recipient = "gcrbadata@gmail.com";
 		}
 	}
+
+	public class SendNewsletterRequest : MailModels {
+		public Image Image { get; set; }
+		public String FirstName { get; set; }
+		public SendNewsletterRequest() {
+			Subject = "GCRBA New Newsletter!";
+			From = "GCRBAWebApp@donotreply";
+			Description = "To unsubscribe from our newsletter, please modify the setting within your user profile";
+		}
+	}
 }

@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using Konscious.Security.Cryptography;
+using GCRBA.Models;
 
 namespace GCRBA.Classes {
 	public class ObfuscatePwd {
@@ -18,12 +19,13 @@ namespace GCRBA.Classes {
 					newEncodedChar -= maxChar;
 				else if (newEncodedChar < minChar)
 					newEncodedChar += maxChar;
-				if (newEncodedChar == 39)
-					newEncodedChar = 32;
+				//if (newEncodedChar == 39)
+				//	newEncodedChar = 32;
 				buffer[i] = (char)newEncodedChar;
 			}
 			return new String(buffer);
 		}
+
 		private byte[] CreateSalt() {
 			var buffer = new byte[24];
 			var rng = new RNGCryptoServiceProvider();
@@ -78,6 +80,49 @@ namespace GCRBA.Classes {
 		}
 
 		public String SimpleDecrypt(String id) {
+			String decryptedId = String.Empty;
+			decryptedId = obfuscateId(id, 7);
+			return decryptedId;
+		}
+
+		
+	}
+
+	public static class StaticObfuscatePwd {
+		public static String GetSystemPassword(String id) {
+			String password = String.Empty;
+			password = StaticDatabase.GetSystemPassword(id);
+			return password;
+		}
+		private static String obfuscateId(String id, int shift) {
+			int maxChar = Char.MaxValue;
+			int minChar = Char.MinValue;
+			char[] buffer = id.ToCharArray();
+			for (int i = 0; i < buffer.Length; i++) {
+				int newEncodedChar = buffer[i] + shift;
+				if (newEncodedChar > maxChar)
+					newEncodedChar -= maxChar;
+				else if (newEncodedChar < minChar)
+					newEncodedChar += maxChar;
+				if (newEncodedChar == 39)
+					newEncodedChar = 32;
+				buffer[i] = (char)newEncodedChar;
+			}
+			return new String(buffer);
+		}
+
+		private static String SimpleObfuscateCredentials(String id) {
+			String obfuscatedId = obfuscateId(id, -7);
+			return obfuscatedId;
+		}
+
+		public static String getSimpleDecrypt(String id) {
+			String decrypted = String.Empty;
+			decrypted = SimpleDecrypt(id);
+			return decrypted;
+		}
+
+		private static String SimpleDecrypt(String id) {
 			String decryptedId = String.Empty;
 			decryptedId = obfuscateId(id, 7);
 			return decryptedId;

@@ -27,7 +27,6 @@ namespace GCRBA.Models
 		};
         public string Email { get; set; }
         public string strUsername { get; set; }
-        
         public String encryptedUsername { get; set; }
         public byte[] Password { get; set; }
         public string strPassword { get; set; }

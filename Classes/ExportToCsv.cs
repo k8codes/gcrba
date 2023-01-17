@@ -96,7 +96,7 @@ namespace GCRBA {
                 if (Location[i] != null) {
                     try {
                         int Index = 0;
-                        LocateFile file = new LocateFile();
+                        LocateCSVFile file = new LocateCSVFile();
                         string file_path = file.GetFilePath();
                         //string file_path = "E:\\Web-Folders\\Students\\Spring\\CPDM-290-200\\CPDM-WinslowS\\CSV_Folder\\Bakery.csv"; //"C:/Users/winsl/OneDrive/Desktop/Capstone/MVC/Views/SendMailer/Bakery.csv"; //"E:/Web-Folders/Students/Spring/CPDM-290-200/CPDM-WinslowS/Views/SendMailer/Bakery.csv";
                         using (StreamWriter streamWriter = new StreamWriter(file_path)) {
@@ -213,7 +213,7 @@ namespace GCRBA {
             }
         }  
 	}
-    public class LocateFile {
+    public class LocateCSVFile {
         public string GetFilePath() {
             try {
                 int fCount = 0;
